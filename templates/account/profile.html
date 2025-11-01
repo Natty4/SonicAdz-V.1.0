@@ -1,0 +1,115 @@
+{% extends "account/base.html" %}
+{% load i18n static %}
+<title>{% block title %}{{ request.user.first_name }} - Profile{% endblock %}</title>
+
+{% block header %}
+    <header class="dashboard-header">
+        <div class="header-left">
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Profile</h1>
+        </div>
+        
+        <div class="header-right">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+        
+            <div class="header-actions">
+                <button class="action-btn notifications" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <div class="user-dropdown">
+                    <button class="user-dropdown-toggle">
+                        {% comment %} <i class="fas fa-chevron-down text-muted"></i> {% endcomment %}
+                        <div class="user-avatar">
+                            <i class="fas fa-user fa-2x"></i>
+                        </div>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="#creator-settings.html">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'account_logout' %}" class="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+{% block dashboard_content %}
+    <div class="profile-card">
+        <div class="profile-header">
+            <i class="fas fa-user fa-3x"></i> 
+            <div class="profile-header-info">
+                <div class="name">{{ request.user.get_full_name }}</div>
+                <div class="username">@{{ request.user.username }}</div>
+                <div class="email"><i class="fas fa-envelope"></i> {{ request.user.email }}</div>
+                <div class="email"><i class="fas fa-phone"></i> {{ request.user.phone_number }}</div>
+                <a href="#" class="profile-edit-link"><i class="fas fa-edit"></i> Edit Profile</a>
+            </div>
+            <div class="badge"><i class="fas fa-tag"> </i> {{ request.user.user_type|capfirst }}</div>
+
+        </div>
+
+        <div class="profile-body">
+            <div class="profile-section">
+                <h3>Personal Information</h3>
+                <ul>
+                    <li>
+                        <strong>First Name:</strong>
+                        {% if request.user.first_name %} 
+                            {{ request.user.first_name }}
+                        {% else %} 
+                            N/A <a href="#" class="profile-edit-link">
+                                    <i class="fas fa-plus-circle"></i>
+                                </a>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <strong>Last Name:</strong>
+                        {% if request.user.last_name %} 
+                            {{ request.user.last_name }}
+                        {% else %} 
+                            N/A <a href="#" class="profile-edit-link">
+                                    <i class="fas fa-plus-circle"></i>
+                                </a>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <strong>Address:</strong>
+                        {% if request.user.address %} 
+                            {{ request.user.address }}
+                        {% else %} 
+                            N/A <a href="#" class="profile-edit-link">
+                                    <i class="fas fa-plus-circle"></i>
+                                </a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+            <div class="profile-section">
+                <h3>Organization</h3>
+                <ul>
+                    {% for org in request.user.organizations %}
+                        <li><a href="{{ link }}" target="_blank">{{ org }}</a></li>
+                    {% empty %}
+                        <li>No Organization linked</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

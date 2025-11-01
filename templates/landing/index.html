@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+{% load static i18n %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+        <div class="skeleton-card skeleton-container">
+            <div class="skeleton skeleton-heading"></div>
+            <div class="skeleton skeleton-chart"></div>
+        </div>
+        
+        <div class="skeleton-card skeleton-container">
+            <div class="skeleton skeleton-heading"></div>
+            <div class="skeleton skeleton-chart"></div>
+        </div>
+
+        <div class="skeleton-container">
+            <div class="skeleton skeleton-heading" style="width: 40%"></div>
+            <div class="skeleton-list">
+                <div class="skeleton skeleton-list-item"></div>
+                <div class="skeleton skeleton-list-item"></div>
+                <div class="skeleton skeleton-list-item"></div>
+            </div>
+        </div>
+
+    <form id="authForm" method="POST" action="{% url 'creator:process_telegram_auth' %}" style="display:none;">
+        {% csrf_token %}
+        <input type="hidden" name="init_data" id="initDataInput">
+    </form>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('authForm');
+            const initDataInput = document.getElementById('initDataInput');
+            const tg = window.Telegram?.WebApp;
+
+           
+            if (!tg || !tg.initData || tg.initData.length === 0) {
+                window.location.href = "https://sonicadz.vercel.app";
+                return;
+            }
+
+            try {
+                
+                tg.expand();
+                tg.enableClosingConfirmation();
+                const theme = tg.colorScheme || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+
+        
+                let headerColor = theme === 'dark' ? '#15202b' : '#ffffff';
+                if (tg?.setHeaderColor) {
+                    tg.setHeaderColor(headerColor);
+                }
+
+                initDataInput.value = tg.initData;
+
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        form.submit();
+                    }, 1000);
+                });
+
+            } catch (err) {
+                console.warn('Error submitting auth form:', err);
+                window.location.href = "/auth/";
+            }
+        });
+    </script>
+</body>
+</html>

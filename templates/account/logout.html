@@ -1,0 +1,21 @@
+{% extends "account/base_auth.html" %}
+{% load allauth i18n %}
+
+{% block title %}{% trans "Sign Out" %}{% endblock %}
+
+{% block auth_content %}
+
+  <div class="auth-header">
+    <h1>{% trans "Sign Out" %}</h1>
+    <p>{% trans "Are you sure you want to sign out?" %}</p>
+  </div>
+
+  <form method="post" action="{% url 'account_logout' %}" class="auth-form">
+    {% csrf_token %}
+    {{ redirect_field }}
+    <button type="submit" class="btn btn-primary btn-block">
+      {% trans "Sign Out" %}
+    </button>
+  </form>
+
+{% endblock %}

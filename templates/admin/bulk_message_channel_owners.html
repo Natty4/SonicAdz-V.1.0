@@ -1,0 +1,106 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="module">
+    <h2>📨 Send Bulk Message to Channel Owners</h2>
+    
+    <div class="form-row">
+        <p><strong>Selected Channels:</strong> {{ channels.count }}</p>
+        <ul>
+            {% for channel in channels|slice:":10" %}
+                <li>{{ channel.title }} ({{ channel.owner.username }})</li>
+            {% endfor %}
+            {% if channels.count > 10 %}
+                <li>... and {{ channels.count|add:"-10" }} more</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        
+        {% for channel in channels %}
+            <input type="hidden" name="_selected_action" value="{{ channel.pk }}">
+        {% endfor %}
+        <input type="hidden" name="action" value="bulk_message_channel_owners">
+        
+        <div class="form-row">
+            <label for="message_type"><strong>Message Type:</strong></label>
+            <select name="message_type" id="message_type" required style="width: 100%; padding: 8px;">
+                <option value="">-- Select Message Type --</option>
+                <option value="welcome">👋 Welcome Message</option>
+                <option value="campaign_opportunity">🎯 Campaign Opportunity</option>
+                <option value="payment_reminder">💰 Payment Reminder</option>
+                <option value="performance_update">📊 Performance Update</option>
+                <option value="platform_update">🆕 Platform Update</option>
+                <option value="custom">✏️ Custom Message</option>
+            </select>
+        </div>
+
+        <div class="form-row" id="custom_message_section" style="display: none;">
+            <label for="notification_title"><strong>Notification Title:</strong></label>
+            <input type="text" name="notification_title" id="notification_title" 
+                   placeholder="Enter notification title" style="width: 100%; padding: 8px;">
+            
+            <label for="custom_message" style="margin-top: 10px;"><strong>Custom Message:</strong></label>
+            <textarea name="custom_message" id="custom_message" rows="6" 
+                      placeholder="Enter your custom message here..." 
+                      style="width: 100%; padding: 8px;"></textarea>
+            <p><small>This message will be sent as both platform notification and Telegram message (if available).</small></p>
+        </div>
+
+        <div class="form-row">
+            <p><strong>Delivery Methods:</strong></p>
+            <ul>
+                <li>✅ Platform notification (always sent)</li>
+                <li>✅ Telegram message (if user has connected Telegram)</li>
+            </ul>
+        </div>
+
+        <div class="submit-row">
+            <input type="submit" name="apply" value="Send Messages" class="default" 
+                   style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+            <a href="../" class="button" 
+               style="padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageTypeSelect = document.getElementById('message_type');
+    const customMessageSection = document.getElementById('custom_message_section');
+    
+    messageTypeSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customMessageSection.style.display = 'block';
+        } else {
+            customMessageSection.style.display = 'none';
+        }
+    });
+});
+</script>
+
+<style>
+.module {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.form-row {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 4px;
+}
+.form-row label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.submit-row {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}

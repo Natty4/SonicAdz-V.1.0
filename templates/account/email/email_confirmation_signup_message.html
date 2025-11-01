@@ -1,0 +1,37 @@
+{% load account %}
+<div style="
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #15202b;
+  color: #e9f5fe;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #2f3336;
+">
+  <p style="font-size: 18px; color: #e9f5fe;">
+    Welcome to <strong style="color: #e9f5fe;">SonicAdz.</strong>
+  </p>
+
+  <p style="color: #8899a6;">
+    Thank you for signing up! Please confirm your email address to activate your new account:
+    <strong style="color: #e9f5fe;">{% user_display user %}</strong>.
+  </p>
+
+  <p style="margin: 30px 0;">
+    <a href="{{ activate_url }}"
+      style="background-color: #1d9bf0; color: #ffffff; padding: 12px 20px; text-decoration: none;
+             border-radius: 5px; display: inline-block; font-size: 16px; cursor:pointer;">
+      Activate Account
+    </a>
+  </p>
+
+  <p style="color: #90b0c8ff;">If the button doesn't work, copy and paste the following link into your browser:</p>
+  <p><a href="{{ activate_url }}" style="color: #1d9bf0;">{{ activate_url }}</a></p>
+
+  <p style="margin-top: 40px; color: #8899a6;">
+    Thanks,<br>
+    The <strong style="color: #e9f5fe;">SonicAdz.</strong> Team
+  </p>
+</div>

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Too Many Requests
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        h1 {
+            font-size: 60px;
+            color: #d01277;
+        }
+        p {
+            font-size: 20px;
+        }
+        .error-card {
+            padding: 10px 20px;
+            margin: 20px 10px;
+            max-width: 100%;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 50px;
+            background-color: #f4f4f4;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div class="container card error-card">
+            <div>
+                <h1>429</h1>
+                <h3>Too Many Requests</h3>
+                <p>You have made too many requests in a short period of time.</p>
+                <p>Please slow down and try again later.</p>
+                <p><a href="/">Go back to the homepage</a></p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

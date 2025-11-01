@@ -1,0 +1,264 @@
+{% extends "account/base_auth.html" %}
+{% load static %}
+{% load i18n %}
+{% load account %}
+
+{% block head_title %}
+  {% trans "Sign Up" %}
+{% endblock head_title %}
+
+{% block auth_content %}
+  <div class="auth-header">
+    <h1>{% trans "Create Your Account" %}</h1>
+    <p>{% trans "Join our platform and start growing your business" %}</p>
+    <p>
+      <small>
+        {% for error in form.user_type.errors %}
+          <div class="error-message">{% trans "Please Choose Account type" %}</div>
+        {% empty %}
+         
+        {% endfor %}
+      </small>
+    </p>
+  </div>
+
+  <!-- User Type Selector -->
+  <div class="user-type-selector {% if form.user_type.errors %} has-error{% endif %}">
+    <button type="button" class="user-type-btn w-full hidden" data-user-type="advertiser">
+      <i class="fas fa-bullhorn"></i>
+      <span>I'm an Advertiser</span>
+    </button>
+    <button type="button" class="user-type-btn w-full hidden" data-user-type="creator">
+      <i class="fas fa-broadcast-tower"></i>
+      <span>I'm a Creator</span>
+    </button>
+  </div>
+
+  {% for error in form.errors %}
+    <div class="error-message">*{{ error }}</div>
+  {% endfor %}
+  <!-- Signup Form -->
+  <form method="post" action="{% url 'account_signup' %}" class="auth-form">
+    {% csrf_token %}
+
+    {{ form.user_type }} {# Hidden input rendered by form #}
+
+    {% comment %} <div class="form-row">
+      <div class="form-group r3{% if form.first_name.errors %} has-error{% endif %}">
+        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          {{ form.first_name }}
+        </div>
+        {% for error in form.first_name.errors %}
+          <div class="error-message">*{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group r3{% if form.last_name.errors %} has-error{% endif %}">
+        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          {{ form.last_name }}
+        </div>
+        {% for error in form.last_name.errors %}
+          <div class="error-message">*{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div> {% endcomment %}
+    
+    <div class="form-row">
+      <div class="form-group{% if form.phone_number.errors %} has-error{% endif %}">
+        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+        <div class="input-wrapper">
+          <i class="fas fa-phone input-icon"></i>
+          {{ form.phone_number.as_widget }}
+        </div>
+        {% for error in form.phone_number.errors %}
+          <div class="error-message">*{{ error }}</div>
+        {% endfor %}
+          <div class="error-message" id="phoneError"></div>
+      </div>
+
+      <div class="form-group{% if form.email.errors %} has-error{% endif %}">
+        <label for="id_email">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          {{ form.email }}
+        </div>
+        {% for error in form.email.errors %}
+          <div class="error-message">*{{ error }}</div>
+        {% endfor %}
+        <div class="error-message" id="emailError"></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group r3{% if form.password1.errors %} has-error{% endif %}">
+        <label for="id_password1">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          {{ form.password1 }}
+          <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        {% for error in form.password1.errors %}
+          <div class="error-message">*{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group r3{% if form.password2.errors %} has-error{% endif %}">
+        <label for="id_password2">Confirm Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          {{ form.password2 }}
+        </div>
+        {% for error in form.password2.errors %}
+          <div class="error-message">*{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">{% trans "Create Account" %}</button>
+
+    <div class="auth-divider"><span>{% trans "or" %}</span></div>
+
+    <div class="social-auth">
+      {% comment %} {% include "socialaccount/snippets/provider_list.html" with process="signup" %} {% endcomment %}
+    </div>
+
+    <div class="auth-footer">
+      <p>{% trans "Already have an account?" %} <a href="{% url 'account_login' %}">{% trans "Log in" %}</a></p>
+    </div>
+  </form>
+{% endblock auth_content %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll('.user-type-btn');
+    const hiddenInput = document.querySelector('input[name="user_type"]');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        hiddenInput.value = btn.dataset.userType;
+      });
+    });
+
+    // Handle user_type from query string (e.g., ?user_type=creator)
+    const urlParams = new URLSearchParams(window.location.search);
+    const userTypeParam = urlParams.get('user_type') || 'advertiser';
+
+    if (userTypeParam) {
+      const targetBtn = document.querySelector(`.user-type-btn[data-user-type="${userTypeParam}"]`);
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+        targetBtn.classList.remove('hidden');
+        hiddenInput.value = userTypeParam;
+      }
+    }
+
+    // --- Phone Number Validation ---
+    const phoneInput = document.getElementById("id_phone_number");
+    const phoneError = document.getElementById("phoneError");
+
+    const normalizePhone = (input) => {
+      let raw = input.trim().replace(/\D/g, '');
+      if (raw.startsWith("0")) raw = raw.slice(1);
+      if (!raw.startsWith("251")) raw = "251" + raw;
+      return "+" + raw;
+    };
+
+    const isValidEthPhone = (phone) => {
+      return /^\+251[79]\d{8}$/.test(phone);
+    };
+
+    const validatePhone = () => {
+      const normalized = normalizePhone(phoneInput.value);
+      phoneInput.value = normalized;
+
+      if (!isValidEthPhone(normalized)) {
+        phoneError.textContent = "* Please enter a valid Ethiopian phone number (e.g. 0911223344)";
+        phoneError.style.color = "red";
+        phoneInput.classList.add("error");
+      } else {
+        phoneError.textContent = "";
+        phoneInput.classList.remove("error");
+      }
+    };
+
+    phoneInput.addEventListener("focus", () => {
+      if (!phoneInput.value.trim()) {
+        phoneInput.value = "+251";
+      }
+    });
+
+    let debouncePhoneTimer = null;
+    phoneInput.addEventListener("input", () => {
+      clearFieldErrors(phoneInput);
+      clearTimeout(debouncePhoneTimer);
+      debouncePhoneTimer = setTimeout(() => {
+        validatePhone();
+      }, 3000);
+    });
+
+    phoneInput.addEventListener("blur", () => {
+      clearTimeout(debouncePhoneTimer);
+      validatePhone();
+    });
+
+    // --- Email Validation ---
+    const emailInput = document.getElementById("id_email");
+    const emailError = document.getElementById("emailError");
+
+    const isValidEmail = (email) => {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const validateEmail = () => {
+      const emailVal = emailInput.value.trim();
+      if (!emailVal) {
+        emailError.textContent = "* Email is required";
+        emailError.style.color = "red";
+        emailInput.classList.add("error");
+      } else if (!isValidEmail(emailVal)) {
+        emailError.textContent = "* Please enter a valid email address";
+        emailError.style.color = "red";
+        emailInput.classList.add("error");
+      } else {
+        emailError.textContent = "";
+        emailInput.classList.remove("error");
+      }
+    };
+
+    let debounceEmailTimer = null;
+    emailInput.addEventListener("input", () => {
+      clearFieldErrors(emailInput); 
+      clearTimeout(debounceEmailTimer);
+      debounceEmailTimer = setTimeout(() => {
+        validateEmail();
+      }, 3000);
+    });
+
+    emailInput.addEventListener("blur", () => {
+      clearTimeout(debounceEmailTimer);
+      validateEmail();
+    });
+
+    const clearFieldErrors = (inputElement) => {
+      const formGroup = inputElement.closest('.form-group');
+      if (!formGroup) return;
+
+      const errorMessages = formGroup.querySelectorAll('.error-message');
+      errorMessages.forEach(msg => {
+        msg.textContent = '';
+      });
+
+      inputElement.classList.remove("error");
+    };
+  });
+</script>
+{% endblock %}

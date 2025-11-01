@@ -1,0 +1,49 @@
+<div style="
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #15202b;
+  color: #e9f5fe;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #2f3336;
+">
+    <p style="font-size: 18px; color: #e9f5fe;">
+        Hello from <strong style="color: #e9f5fe;">SonicAdz.</strong>
+    </p>
+
+    <p style="color: #8899a6;">
+    You are receiving this email because you (or someone else) tried to sign up for an
+    account using this email address: <strong>{{ email }}</strong>.
+    </p>
+
+    <p style="color: #8899a6;">
+    However, an account using that email address already exists.
+    </p>
+
+    <p style="color: #8899a6;">
+    If you forgot your password, you can reset it by clicking the button below:
+    </p>
+
+    <p>
+    <a href="{{ password_reset_url }}" style="background-color: #1c88fbff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; cursor:pointer;">
+        Reset Your Password
+    </a>
+    </p>
+
+    <p style="color: #90b0c8ff;">
+        If the button doesn't work, you can also copy and paste the following link into your browser:
+    </p>
+
+    <p><a href="{{ password_reset_url }}">{{ password_reset_url }}</a></p>
+
+    <br>
+
+    <p>If you didn’t request this, you can safely ignore this message.</p>
+
+     <p style="margin-top: 40px; color: #8899a6;">
+        Thanks,<br>
+        The <strong style="color: #e9f5fe;">SonicAdz.</strong> Team
+    </p>
+</div>

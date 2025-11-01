@@ -1,0 +1,15 @@
+Hello from SonicAdz.
+
+You are receiving this email because you (or someone else) tried to sign up for an
+account using this email address: {{ email }}
+
+However, an account using that email address already exists.
+
+If you forgot your password, you can reset it using the link below:
+
+{{ password_reset_url }}
+
+If you didn’t request this, you can safely ignore this message.
+
+Thanks,  
+The SonicAdz. Team

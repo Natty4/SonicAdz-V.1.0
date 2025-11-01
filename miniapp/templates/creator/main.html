@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Creator Dashboard</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/utilities.css" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <!-- Telegram WebApp JS -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="/static/js/app.js"></script>
+
+</head>
+<body>
+    <div id="pull-down-indicator">↓ Pull to refresh</div>
+    <div class="alert-messages" id="alert-messages">  
+    </div>
+    <div class="preloader" id="preloader">        
+        <div class="preload-sonic-portal">
+            <div class="portal-ring">
+                <div class="spark-container">
+                </div>
+            </div>
+            <div class="emerald"></div>
+        </div>
+    </div>
+    <div id="app">
+        <!-- Navigation Tabs -->
+        <nav class="card-grid">
+            <button class="card tab" data-view="dashboardView">
+                <div class="header-actions">
+                    {% if notifications %}
+                        <div class="action-btn notifications" aria-label="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge" id="notification-badge">{{ notifications|length }}</span>
+                        </div>
+                    {% else %}
+                        <div class="action-btn notifications" aria-label="Notifications">
+                            <i class="fas fa-home"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </button>
+            <button class="card tab" data-view="channelsView">
+                <i class="fas fa-satellite-dish"></i>
+                <span>Channel</span>
+            </button>
+            <button class="card tab" data-view="paymentView">
+                <i class="fas fa-wallet"></i>
+                <span>Payment</span>
+            </button>
+            <button class="card tab" data-view="adsView">
+                <i class="fas fa-ad"></i>
+                <span>Adz</span>
+            </button>
+            <button class="card tab" id="open-settings" data-view="settingsView"> <!-- usere profile and account related settings -->
+                <i class="fas fa-gear"></i>
+                <span>Settings</span>
+            </button>
+            <button class="card" id="openBot" data-bot-link={{bot_link|default:'https://t.me/'}}>
+                <i class="fas fa-robot"></i>
+                <span>Bot</span>
+            </button>
+            
+        </nav>
+        <!-- Notification Modal -->
+        <div id="notification-modal" class="notification-hidden">
+            <div class="notification-modal-content">
+                <!-- Populated by DataRenderer.renderNotifications -->
+            </div>
+        </div>
+        <!-- Main View Container -->
+        <main class="views" id="views"> 
+            
+            <!-- === View: Dashboard === -->
+            <section id="dashboardView" class="view">
+                <div class="container pl-0 pr-0">
+                    <div class="chart-container">
+                        <canvas id="creatorEarningsLineChart"></canvas>
+                    </div>
+                </div>
+                <div class="channels-grid">
+                    {% for channel in top_channels|slice:'1' %}
+                        <div class="channel-card relative container">
+                            <div class="channel-header">
+                                <img src="{{ channel.pp_url|default:user.telegram_profile.photo_url}}" alt="" class="channel-icon">
+                                <div class="channel-info">
+                                    <h3 class="channel-name">{{ channel.title|truncatechars:21 }}</h3>
+                                    <p class="channel-subscribers">{{ channel.subscribers }} subscribers</p>
+                                </div>
+                                <div class="status-position channel-status badge {{ channel.status }}">
+                                    {{ channel.get_status_display }}
+                                </div>
+                            </div>
+                            <div class="channel-stats">
+                                <div class="channel-stat">
+                                    <p class="stat-label">Ads Running</p>
+                                    <p class="stat-value"><i class="fas fa-spinner fa-spin"></i></p>
+                                </div>
+                                <div class="channel-stat">
+                                    <p class="stat-label">Score</p>
+                                    <p class="stat-value">{{channel.ml_score|default:0 }}</p>
+                                </div>
+                                <div class="channel-stat">
+                                    <p class="stat-label">Earnings</p>
+                                    <p class="stat-value">ETB {{ channel.total_earnings|default:"0" }}</p>
+                                </div>
+                            </div>
+                            <div class="channel-actions">
+                                <span class="text-xs text-brand cursor-pointer" id="viewDetails" onclick="switchView('channelsView')">View Details</span>
+                                <span class="text-xs text-brand cursor-pointer" id="manageAds" onclick="switchView('adsView')">Manage Ads</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <!-- Active Ads Section -->
+                <div class="ads">
+                    <div class="section-header">
+                        <h3>Active Ads <small class="text-success text-sm">( {{ active_ad_placements|length }} ) </small></h3>
+                        <div class="text-xs text-brand cursor-pointer" onclick="switchView('adsView')">View All</div>
+                    </div>
+                </div>
+
+                <!-- Recent activities Log -->
+                <div class="card recent-activity-section">
+                    <div class="section-header">
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <div class="section-content">
+                        <ul class="activity-list">
+                            {% for log in activity_logs %}
+                                <li class="activity-item">
+                                    <div class="activity-icon">
+                                        {{ log.icon_svg|safe }}
+                                    </div>
+                                    <div class="activity-content">
+                                        <p><strong>{{ log.change_message }}</strong> {{ log.get_action_flag_display }}</p>
+                                        <span class="activity-time">{{ log.action_time|timesince }} ago</span>
+                                    </div>
+                                </li>
+                            {% empty %}
+                                <li>No recent activities</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                {% if top_channels|length == 0 and activity_logs|length == 0 %}
+                    <div class="onboarding-container mt-6" id="onboarding-block">
+                        <div class="onboarding-message text-center">
+                            <h2>Welcome again, {{ user.first_name }} 👋</h2>
+                            <p class="text-base mt-2">You're just a few steps away from turning your audience into earnings.</p>
+                            <ul class="onboarding-steps text-start text-xs mt-4 mb-6 leading-relaxed">
+                                <div class="card mt-2">📢 <strong>Add your first channel</strong> → this is where your journey starts.</div>
+                                <div class="card mt-2">✅ <strong>Verify your channel</strong> to enable ad placements and insights.</div>
+                                <div class="card mt-2">💰 <strong>Watch your performance grow</strong> and earn based on ad performance.</div>
+                            </ul>
+                            <div class="flex justify-center items-center">
+                                <button class="btn btn-primary w-full" id="createChannel" onclick="toggleChannelBottomSheet()">
+                                    <span>Add Channel</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            
+            </section>
+
+            <!-- === View: Channel === -->
+            <section id="channelsView" class="view hidden">
+                <div class="flex justify-center mt-8">
+                    Loading...
+                </div>
+            </section>
+
+            <!-- === View: Payments === -->
+            <section id="paymentView" class="view hidden">
+                <div class="flex justify-center mt-8">
+                    Loading...
+                </div>
+            </section>
+
+
+            <!-- === View: Ads=== -->
+            <section id="adsView" class="view hidden">
+                <div class="flex justify-center mt-8">
+                    Active ads will be here.
+                </div>
+            </section>
+
+            <!-- === View: Settings===-->
+            <section id="settingsView" class="view hidden" data-view="settingsView">
+                <div class="flex justify-center mt-8">
+                    Loading...
+                </div>
+            </section>
+
+        </main>
+        <div class="modals">
+
+            <!-- Bottom Sheet: Add PAyment Methods-->
+            <div id="bottomSheetWrapper" class="bottom-sheet-wrapper hidden">
+                <div id="bottomSheet" class="bottom-sheet">
+                    <div class="bottom-sheet-content">
+                        <div class="sheet-header flex justify-between items-center">
+                            <h3>Add Payment Method</h3>
+                            <button onclick="toggleBottomSheet()" class="close-btn">&times;</button>
+                        </div>
+                        <div class="method-toggle-group" id="methodTypeToggle"></div>
+                        <form id="paymentMethodForm">
+                            <input type="hidden" name="payment_method_type" id="methodType" required />
+
+                            <div id="bankFields" class="hidden">
+                                <input name="account_number" id="accountNumber" placeholder="Account Number" />
+                            </div>
+                            <div id="walletFields" class="hidden">
+                                <input name="phone_number" id="phoneNumber" placeholder="Phone Number" />
+                            </div>
+
+                            <div id="commonField" class="hidden">
+                                <input type="text" name="account_name" id="accountName" placeholder="Full Name" required />
+                            </div>
+
+                            <div id="methodActions" class="hidden">
+                                <div class="toggle-wrapper">
+                                    <label for="isDefault" class="toggle-label">
+                                    <input type="checkbox" id="isDefault" name="is_default" />
+                                    <span class="toggle-slider"></span>
+                                    Set as default
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn">Save Method</button>
+                                <div id="formErrorMessage"></div>
+                            </div>
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Sheet: Add Channel -->
+            <div id="channelBottomSheetWrapper" class="bottom-sheet-wrapper hidden">
+                <div id="channelBottomSheet" class="bottom-sheet">
+                    <div class="bottom-sheet-content">
+                        <!-- Header -->
+                        <div class="sheet-header">
+                            <h3 id="channel_sheet_header">Telegram Channel Registration</h3>
+                            <button id="closeChannelBtn" onclick="toggleChannelBottomSheet()" class="close-btn">&times;</button>
+                        </div>
+
+                        <!-- Step 1: Registration Form -->
+                        <form id="channelRegistrationForm" class="gap-4">
+                            <div>
+                                <input type="url" id="channelLink" name="channel_link" placeholder="Channel Link (https://t.me/yourchannel)" required />
+                            </div>
+                            <div class="flex">
+                                <!-- Languages -->
+                                <span class="text-muted tooltip-icon" data-tooltip="Choose the language(s) your channel speaks. We'll prioritize showing ads that use these languages.">
+                                    <i class="fas fa-info-circle mt-4 mr-2"></i>
+                                </span>
+                                <div class="field-group">
+                                    <label class="label">Select Languages</label>
+                                    <div id="languageCheckboxes" class="checkbox-pill-group"></div>
+                                </div>
+                            </div>
+                            <div class="flex">
+                                <!-- Categories -->
+                                <span class="text-muted tooltip-icon" data-tooltip="Pick up to 3 categories that your channel focus. This helps us match your channel with the most relevant contents.">
+                                    <i class="fas fa-info-circle mt-4 mr-2"></i>
+                                </span>
+                                <div class="field-group">
+                                    <label class="label">Select Categories</label>
+                                    <div id="categoryCheckboxes" class="checkbox-pill-group"></div>
+                                </div>
+                            </div>
+
+                            <input type="number" id="minCpm" name="min_cpm" min="1" step="0.01" placeholder="Minimum CPM (ETB)" required />
+                            <span class="text-muted tooltip-icon" data-tooltip="The Minimum Cost Per 1000 Impressions you want to charge for this channel, Birr.">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                            
+                            <button type="submit" class="btn mt-4">Register Channel</button>
+                            <div id="channelFormError" class="formErrorMessage text-xs text-center"></div>
+                        </form>
+
+                        <!-- Step 2: Verification Display -->
+                        <div id="channelVerificationMessage" class="hidden mt-4">
+                            <p class="font-semibold text-lg"> 
+                                <svg width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="boltGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#00e47a"/>
+                                            <stop offset="100%" stop-color="#4f04b9"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path 
+                                        d="M280 16L64 296H224L192 496L448 200H288L320 16H280Z" 
+                                        fill="url(#boltGradient)"/>
+                                </svg>
+                                Channel submitted!
+                            </p>
+
+                            <div class="box">
+                                <p class="heading font-semibold text-base mb-1">Final Step: Add the Bot</p>
+
+                                <p class="text-sm text-muted mb-3">
+                                    To get started, add the bot to your channel as an admin with <strong class="text-brand">Post Messages</strong> permission. This will allow the bot to post ads automatically or with your approval, so you can start earning immediately.
+                                </p>
+
+                                <!-- Optional mini-guide image -->
+                                <div class="image-container mb-1 text-center p-1" style="height: 150px; overflow:clip;">
+                                    <img src="https://res.cloudinary.com/dyhszaw1f/image/upload/v1757699377/kgv6mkaxukqacau8g7z4.png" alt="How to Add" style="max-width:200px; border-radius:6px;" />
+                                </div>
+
+                                <p class="text-sm mb-3">
+                                    Tap the button below to add the bot to your channel and grant it <strong class="text-brand"><i class="fas fa-check-circle"></i> Post Messages</strong> permission.
+                                </p>
+
+                                <li id="instructionText" class="hidden mt-2 text-danger text-muted text-sm">
+                                    Ensure the bot is added as an <strong class="text-brand">admin</strong> in the correct channel and has atleast the following permission:
+                                    <ul class="text-brand list-disc list-inside ml-4 mt-1">
+                                        <li><i class="fas fa-check-circle"></i> Post Messages</li>
+                                    </ul>
+                                </li>
+                                
+                                <p class="text-sm text-muted mb-3">
+                                    Once added, return here and click <strong>Complete Verification</strong> to activate ad posting and start earning per view.
+                                </p>
+
+                                <button id="proceedBtn" class="btn">Add Bot</button>
+                                <button id="verifyBtn" class="btn disabled mt-1" disabled>Complete Verification</button>
+
+                                <p class="expiry-note mt-3 text-xs text-muted">
+                                    <i class="fas fa-clock"></i> Verification expires in 24 hours.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Sheet: Confirm Payout-->
+            <div id="withdrawBottomSheetWrapper" class="bottom-sheet-wrapper hidden">
+                <div id="withdrawalBottomSheet" class="bottom-sheet">
+                    <div class="bottom-sheet-content">
+                    <div class="sheet-header flex justify-between items-center">
+                        <h3>Request Withdrawal</h3>
+                        <button type="button" id="cancel-withdrawal" class="btn">&times;</button>
+                    </div>
+                    <form id="withdrawalForm">
+                        <div class="input-group">
+                            <label for="withdraw-amount">Enter Amount (Max: <span id="max-amount"></span>)</label>
+                            <input type="number" id="withdraw-amount" min="100" placeholder="Enter amount" class="form-control" />
+                        </div>
+                        <div class="bottom-sheet-actions">
+                            <button type="button" id="confirm-withdrawal" class="btn btn-success mt-2">Confirm Withdrawal</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Bottom Sheet: Edit Channel -->
+            <div id="editChannelBottomSheetWrapper" class="bottom-sheet-wrapper hidden">
+                <div id="editChannelBottomSheet" class="bottom-sheet">
+                    <div class="sheet-header">
+                    <h3>Edit Channel</h3>
+                    <button id="closeEditChannelBtn" class="close-btn">
+                        &times;
+                    </button>
+                    </div>
+                    <div class="sheet-content">
+                        <form id="editChannelForm">
+                            <div class="input-group">
+                                <label class="text-sm" for="editMinCpm">Minimum CPM (ETB)</label>
+                                <input class="mt-0" type="number" id="editMinCpm" name="min_cpm" min="1" step="0.01" required>
+                            </div>
+                            
+                            <div class="input-group mt-2">
+                                <label class="mt-1">Languages</label>
+                                <div id="edit-language-group" class="checkbox-pill-group"></div>
+                                <small class="text-muted">Select up to 3 languages, which your channel speaks.</small>
+                            </div>
+                            
+                            <div class="input-group mt-2">
+                                <label class="mt-1">Max Repost Preferences</label>
+                                <div class="grid-2 gap-1">
+                                    <div class="input-group">
+                                        <input class="mt-0" type="number" id="editRepostFrequency" name="repost_preference_frequency" min="1" max="21" required>
+                                        <small class="text-muted">Times per period</small>
+                                    </div>
+                                    <div class="input-group">
+                                        <select class="h-full bg-transparent" id="editRepostPreference" name="repost_preference" required>
+                                            <option value="day">Daily</option>
+                                            <option value="week">Weekly</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group mt-2">
+                                <label class="switch-label mt-1">Auto-Publish Ads</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="editAutoPublish" name="auto_publish">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <small class="text-muted">When enabled, ads will be published automatically without manual approval</small>
+                            
+                            <div class="bottom-sheet-actions mt-2 justify-center">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <footer class="text-xs">
+        <p>&copy;<span id="currentYear"></span> SonicAdz. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Get the element where the year will be displayed
+        const yearEl = document.getElementById('currentYear');
+        
+        // Get the current year
+        const currentYear = new Date().getFullYear();
+        
+        // Set the text content of the element to the current year
+        yearEl.textContent = currentYear;
+    </script>
+</body>
+</html>

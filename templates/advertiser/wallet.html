@@ -1,0 +1,43 @@
+{% extends "advertiser/base.html" %}
+{% load i18n static %}
+{% load custom_filters %}
+<title>{% block title %}{{ request.user.first_name }} - Wallet{% endblock %}</title>
+{% block dashboard_content %}
+
+    <section class="dashboard-section">
+        <div class="container ">
+            <div class="card center mb-4">
+                <h2>Wallet</h2>
+                <div class="dashboard-cards">
+                    <div class="card metric-card">
+                        <div class="card-content">
+                        <div class="metric-value">ETB {{ wallet.balance|shorten_number:'2' }}</div>
+                        <div class="metric-label">Balance</div>
+                        <div class="metric-change positive">available balance</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                        <div class="metric-value ">ETB {{ wallet.frozen_amount|shorten_number:'2' }}</div>
+                        <div class="metric-label text-warning">Frozen Balance</div>
+                        <div class="metric-change text-warning negative">minimum (2) days</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                        <div class="metric-value">ETB {{ wallet.total_spent|shorten_number:'2' }}</div>
+                        <div class="metric-label">Spent</div>
+                        <div class="metric-change negative">-2.1%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions mt-6 flex flex-row justify-between">
+                    <a href="{% url 'advertiser:deposit' %}" class="btn btn-outline--green mt-1">Deposit Funds</a> 
+                    <a href="{% url 'advertiser:transactions' %}" class="btn btn-sm mt-1">View Transactions</a>
+                </div>
+            </div>
+        </div>
+        
+    </section>
+    
+{% endblock %}

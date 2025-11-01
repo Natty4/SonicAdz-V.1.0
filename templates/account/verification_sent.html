@@ -1,0 +1,21 @@
+{% extends "account/base_auth.html" %}
+{% load i18n account allauth %}
+
+{% block title %}{% trans "Confirm Email Sent" %}{% endblock %}
+
+{% block auth_content %}
+ 
+    <div class="auth-header">
+      <h1>{% trans "We've sent a confirmation email to your address." %}</h1>
+      <p>{% trans "Please check your email." %}</p>
+    </div>
+
+    <a href="{% url 'account_login' %}" class="button button-primary" style="margin-top: 1rem;">
+      Go to Login
+    </a>
+{% endblock %}
+
+<div class="auth-image">
+  {% block auth_illustration %}
+  {% endblock %}
+</div>

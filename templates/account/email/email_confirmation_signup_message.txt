@@ -1,0 +1,17 @@
+{% load account %}
+
+Welcome to SonicAdz.
+
+Thank you for signing up! Please confirm your email address to activate your new account:
+{% user_display user %}
+
+To activate your account, please click the link below:
+
+Activation Link:
+{% url 'account_confirm_email' key=key as activate_url %}
+{{ activate_url }}
+
+If you are having trouble with the link, please copy and paste it into your browser.
+
+Thanks,
+The SonicAdz. Team

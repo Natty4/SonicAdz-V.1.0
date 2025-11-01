@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SonicAdz - Account{% endblock %}</title>
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="{% static 'css/advertiser/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/utilities.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/styles.css' %}">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <div class="alert-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <span type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        {% comment %} <i class="fa fa-close"></i> {% endcomment %}
+                    </span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+  <div class="page-wrapper auth-page">
+
+    <!-- Header -->
+    <header class="header header-simple">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="">
+              <img src="{% static 'image/logo-1.png' %}" alt="SonicAdz Logo" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <section class="auth-section">
+        <div class="container">
+          <div class="auth-container">
+            <div class="auth-form-container">
+              {% block auth_content %}
+                Please Folow the instructions 
+                <!-- Page-specific content goes here -->
+              {% endblock %}
+            </div>
+
+            <div class="auth-image">
+              {% block auth_illustration %}
+              <!-- Optionally override image for each page -->
+              <!-- <img src="{% static 'images/auth-default.jpg' %}" alt="Authentication Illustration" /> -->
+              {% endblock %}
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-simple">
+      <div class="container">
+        <div class="footer-bottom">
+          <p>&copy; {% now "Y" %} SonicAdz. All rights reserved.</p>
+          <div class="footer-links-simple">
+            <a href="https://telegra.ph/SonicAdz-Terms-and-Conditions--Privacy-Policy-08-13" target="_blank">Terms & Privacy</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- JS Files -->
+  <script src="{% static 'js/form-validation.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% extends "account/base.html" %}
+{% load i18n static %}
+<title>{% block title %}{{ current_user.first_name }} - EditProfile{% endblock %}</title>
+{% block dashboard_content %}
+
+    <div class="form-card">
+        <h2><i class="fas fa-user"></i> Edit Profile</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="profile-pictu edit">
+                
+            </div>
+            <div class="form-row">
+                <div class="form-group r3">
+                    <label for="{{ profile_form.first_name.id_for_label }}">First Name</label>
+                    {{ profile_form.first_name }}
+                    {% if profile_form.first_name.errors %}
+                        <div class="invalid-feedback danger">
+                            {% for error in profile_form.first_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="user_form-text text-muted">{{ profile_form.first_name.help_text }}</small>
+                </div>
+                <div class="form-group r3">
+                    <label for="{{ profile_form.last_name.id_for_label }}">Last Name</label>
+                    {{ profile_form.last_name }}
+                    {% if profile_form.last_name.errors %}
+                        <div class="invalid-feedback danger">
+                            {% for error in profile_form.last_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="user_form-text text-muted">{{ profile_form.last_name.help_text }}</small>
+                </div>
+                
+            </div>
+            <div class="form-row">
+                <div class="form-group ">
+                    <label for="{{ profile_form.email.id_for_label }}">Email</label>
+                    {{ profile_form.email }}
+                    {% if profile_form.email.errors %}
+                        <div class="invalid-feedback danger">
+                            {% for error in profile_form.email.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="user_form-text text-muted">{{ profile_form.email.help_text }}</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ profile_form.address.id_for_label }}">Address</label>
+                    {{ profile_form.address }}
+                    {% if profile_form.address.errors %}
+                        <div class="invalid-feedback danger">
+                            {% for error in profile_form.address.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="profile_form-text text-muted">{{ profile_form.address.help_text }}</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            
+        </form>
+        
+            <div class="flex flex-row  justify-between mt-4">
+                <a href="{% url 'users:profile' %}" class="back-link btn btn-sm">← Back to Profile</a>
+                <a href="{% url 'account_email' %}" class="danger btn btn-sm"> change your email addres</a>
+            </div>
+
+    </div>
+
+{% endblock %}

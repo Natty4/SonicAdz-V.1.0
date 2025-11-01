@@ -1,0 +1,41 @@
+{% extends "advertiser/base.html" %}
+{% load i18n static %}
+<title>{% block title %}{{ request.user.first_name }} - Transaction{% endblock %}</title>
+{% block dashboard_content %}
+    <section class="dashboard-section">
+        <div class="container justify-center flex">
+            <div class="card w-full">
+                <h2>Transaction History</h2>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <tr>
+                            <th>Date</th><th>Type</th><th>Amount</th><th>Note</th>
+                        </tr>
+                        {% for tx in transactions %}
+                        <tr>
+                        <td>{{ tx.created_at }}</td>
+                        <td>
+                            {% if tx.transaction_type == 'deposit' %}
+                                <i class="fas fa-plus" style="color:green;"></i>  <!-- money coming in -->
+                            {% elif tx.transaction_type == 'freeze' %}
+                                <i class="fas fa-snowflake" style="color:orange;"></i>  <!-- freeze = snowflake -->
+                            {% elif tx.transaction_type == 'unfreeze' %}
+                                <i class="fas fa-fire" style="color:blue;"></i>  <!-- unfreeze = fire or sun -->
+                            {% elif tx.transaction_type == 'deduct' %}
+                                <i class="fas fa-minus" style="color:red;"></i>  <!-- money going out -->
+                            {% endif %}
+                            {{ tx.get_transaction_type_display }}
+                        </td>
+                        <td>ETB{{ tx.amount }}</td>
+                        <td>{{ tx.note }}</td>
+                    </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No transactions found.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <a href="{% url 'advertiser:wallet' %}" class=""><- Back</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

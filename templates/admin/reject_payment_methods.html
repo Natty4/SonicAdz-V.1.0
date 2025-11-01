@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+  <style>
+        span, textarea, label {
+            display: block;
+            margin-top: 0.5rem;
+        }
+    </style>
+  <div class="module aligned">
+    <h2 class="text-danger">
+      {% blocktrans count methods_count=methods|length %}
+          Are you sure you want to reject the selected payment method?
+      {% plural %}
+          Are you sure you want to reject the {{ methods_count }} selected payment methods?
+      {% endblocktrans %}
+    </h2>
+
+    <form method="post" class="form-group">{% csrf_token %}
+      <fieldset class="module aligned">
+        {{ form.as_p }}
+      </fieldset>
+
+      <!-- Action and selected items -->
+      <input type="hidden" name="action" value="reject_methods" />
+      {% for method in methods %}
+          <input type="hidden" name="_selected_action" value="{{ method.pk }}" />
+      {% endfor %}
+
+      <div class="submit-row" style="margin-top: 2rem;">
+        <button type="submit" class="button default" style="margin: 1rem 0; min-width: 200px; padding:0.5rem;" name="apply">
+          ❌ Reject Selected
+        </button>
+        <a href="." class="button cancel-link" style="margin-left: 10px;">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

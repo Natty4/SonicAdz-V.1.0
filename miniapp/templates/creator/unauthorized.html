@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Unauthorized{% endblock %}
+{% block content %}
+<section class="">
+    <div class="container">
+        <h2>Access Denied 🚫</h2>
+        {% comment %} <p>You’re not authorized to view this page or your session has expired.</p> {% endcomment %}
+        <h2 style="display:none;">Hi <span id="name" ></span> 😉</h2>
+        {% if messages %}
+          {% for message in messages %}
+            <p style="color:#d01277; margin-top:1.5rem;">{{ message }}</p>
+          {% endfor %}
+        {% else %}
+          <p style="color:#d01277; margin-top:1.5rem;">You are not authorized to access this page.</p>
+        {% endif %}
+        <div class="flex flex-row justify-between">
+          <a href="{{bot}}" class="mt-4 ">Back to Telegram</a>
+          <a href="/" class="mt-4">Try Again</a>
+        </div>
+    </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const tg = window?.Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user;
+    user_desply = document.getElementById("name");
+      
+    if (user) {
+      user_desply.style.display = "block";
+      user_desply.textContent = `${user.first_name || ""} ${user.last_name || ""}`;
+    }
+    });
+
+
+</script>
+{% endblock %}

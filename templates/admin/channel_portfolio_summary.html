@@ -1,0 +1,260 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block extrahead %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <p>Showing financial breakdown for <strong>{{ selected_count }}</strong> channels.</p>
+
+    {% if summary %}
+    {{ summary|json_script:"channels-data" }}
+    {{ category_data|json_script:"category-breakdown" }}
+
+    <div class="module">
+        <h2>Channel Financial Metrics</h2>
+        <button id="exportCsvBtn" style="margin: 1rem 0;" class="button">Export CSV</button>
+        <table id="result_list">
+            <thead>
+                <tr>
+                    <th>Profile</th>
+                    <th>Channel</th>
+                    <th>Owner</th>
+                    <th>Subscribers</th>
+                    <th>Min Cost (ETB)</th>
+                    <th>Max Cost (ETB)</th>
+                    <th>Avg. Cost (ETB)</th>
+                    <th>Avg. Engagement Rate (%)</th>
+                    <th>Rating</th>
+                    <th>Avg Views</th>
+                    <th>Max Views</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in summary %}
+                <tr class="{% cycle 'row1' 'row2' %}">
+                    <td>
+                        {% if row.pp_url %}
+                        <img src="{{ row.pp_url }}" width="40" height="40" style="border-radius:50%;">
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ row.channel_link }}" target="_blank">{{ row.title }}</a></td>
+                    <td>{{ row.owner__username }}</td>
+                    <td>{{ row.subscribers }}</td>
+                    <td style="color: green;">ETB{{ row.min_cost|floatformat:2 }}</td>
+                    <td style="color: #1447ffff;">ETB{{ row.max_cost|floatformat:2 }}</td>
+                    <td style="color: #c77d00;">ETB{{ row.avg_cost|floatformat:2 }}</td>
+                    <td>{{ row.avg_er|floatformat:2 }}</td>
+                    <td>{{ row.avg_rating|floatformat:2 }}</td>
+                    <td>{{ row.views_avg }}</td>
+                    <td>{{ row.views_max }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align: right;"><strong>Grand Totals:</strong></td>
+                    <td><strong>ETB{{ grand_min|floatformat:2 }}</strong></td>
+                    <td><strong>ETB{{ grand_max|floatformat:2 }}</strong></td>
+                    <td colspan="4"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="module" style="margin-top: 40px;">
+        <h2>Financial Visualization</h2>
+
+        <div style="max-width: 100%;">
+            <canvas id="costChart" height="150"></canvas>
+        </div>
+
+        <div class="chart-card" style="display: flex; gap: 1rem; margin-top: 40px">
+            <div>
+                <canvas id="engagementChart" height="300"></canvas>
+            </div>
+
+            <div>
+                <canvas id="categoryChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = JSON.parse(document.getElementById('channels-data').textContent);
+
+        const labels = data.map(d => d.title);
+        const minCosts = data.map(d => parseFloat(d.min_cost || 0));
+        const maxCosts = data.map(d => parseFloat(d.max_cost || 0));
+        const avgCosts = data.map(d => parseFloat(d.avg_cost || 0));
+        const engagement = data.map(d => parseFloat(d.avg_er || 0));
+        const rating = data.map(d => parseFloat(d.avg_rating || 0));
+
+        // Cost Bar Chart
+        new Chart(document.getElementById('costChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Min Cost (ETB)', data: minCosts, backgroundColor: '#4CAF50' },
+                    { label: 'Max Cost (ETB)', data: maxCosts, backgroundColor: '#2196F3' },
+                    { label: 'Avg Cost (ETB)', data: avgCosts, backgroundColor: '#FF9800' }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Min / Max / Avg Campaign Cost per Channel'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true },
+                    x: {
+                        ticks: {
+                            maxRotation: 90,
+                            minRotation: 45,
+                            autoSkip: true,
+                            maxTicksLimit: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Engagement vs Rating Scatter Chart
+        const scatterData = data.map(d => ({
+            x: parseFloat(d.avg_er || 0),
+            y: parseFloat(d.avg_rating || 0),
+            label: d.title
+        }));
+
+        new Chart(document.getElementById('engagementChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Channel',
+                    data: scatterData,
+                    backgroundColor: '#9C27B0'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Engagement Rate vs Rating (Scatter Plot)'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = context.raw;
+                                return `${point.label}: Engagement ${point.x.toFixed(2)}%, Rating ${point.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Engagement Rate (%)' },
+                        beginAtZero: true
+                    },
+                    y: {
+                        title: { display: true, text: 'Rating' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Doughnut Chart with Enhanced Tooltips
+        const categoryData = JSON.parse(document.getElementById('category-breakdown').textContent);
+        const catLabels = categoryData.map(c => c.category || 'Uncategorized');
+        const catCounts = categoryData.map(c => c.count);
+        const totalChannels = catCounts.reduce((sum, val) => sum + val, 0);
+
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: catLabels,
+                datasets: [{
+                    label: 'Category Breakdown',
+                    data: catCounts,
+                    backgroundColor: [
+                        '#2196F3', '#4CAF50', '#FFC107', '#FF5722', '#9C27B0', '#00BCD4', '#795548', '#607D8B'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Channel Category Distribution'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const count = context.raw;
+                                const percentage = ((count / totalChannels) * 100).toFixed(1);
+                                return `${context.label}: ${count} channels (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        document.getElementById('exportCsvBtn').addEventListener('click', () => {
+            const table = document.getElementById('result_list');
+            let csv = [];
+            // Get headers
+            const headers = Array.from(table.querySelectorAll('thead th'))
+                .map(th => '"' + th.innerText.trim().replace(/"/g, '""') + '"');
+            csv.push(headers.join(','));
+
+            // Get rows
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cols = Array.from(row.querySelectorAll('td')).map(td => {
+                    // For images, export the src URL
+                    if (td.querySelector('img')) {
+                        return '"' + td.querySelector('img').src + '"';
+                    }
+                    return '"' + td.innerText.trim().replace(/"/g, '""') + '"';
+                });
+                csv.push(cols.join(','));
+            });
+
+            // Add footer rows if needed
+            const footer = table.querySelector('tfoot tr');
+            if (footer) {
+                const footerCols = Array.from(footer.querySelectorAll('td')).map(td => '"' + td.innerText.trim().replace(/"/g, '""') + '"');
+                csv.push(footerCols.join(','));
+            }
+
+            const csvString = csv.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `channel_financial_summary_${new Date().toISOString().slice(0,10)}.csv`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+    </script>
+
+    {% else %}
+    <p>No channels with complete financial data were found.</p>
+    {% endif %}
+
+    <p><a href="javascript:history.back()" class="button">Back to Channel List</a></p>
+</div>
+{% endblock %}

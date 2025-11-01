@@ -1,0 +1,77 @@
+{% extends "account/base_auth.html" %}
+{% load static allauth i18n %}
+
+{% block title %}{% trans "Email Addresses" %}{% endblock %}
+
+{% block auth_content %}
+  <div class="auth-header">
+    <h1>{% trans "Email Addresses" %}</h1>
+    <p>{% trans "Manage the email addresses linked to your account" %}</p>
+  </div>
+
+  {% if emailaddresses %}
+    <form method="post" action="{% url 'account_email' %}" class="auth-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for radio in emailaddress_radios %}
+        {% with email=radio.emailaddress %}
+          <div class="form-group">
+            <label>
+              <input type="radio" name="email" value="{{ email.email }}" {% if radio.checked %}checked{% endif %}>
+              {{ email.email }}
+              {% if email.verified %}
+                <span class="badge badge-success">{% trans "Verified" %}</span>
+              {% else %}
+                <span class="badge badge-warning">{% trans "Unverified" %}</span>
+              {% endif %}
+              {% if email.primary %}
+                <span class="badge badge-primary">{% trans "Primary" %}</span>
+              {% endif %}
+            </label>
+          </div>
+        {% endwith %}
+      {% endfor %}
+
+      <div class="form-actions">
+        <button type="submit" name="action_primary" class="btn btn-primary">{% trans "Make Primary" %}</button>
+        <button type="submit" name="action_send" class="btn btn-secondary">{% trans "Re-send Verification" %}</button>
+        <button type="submit" name="action_remove" class="btn btn-danger">{% trans "Remove" %}</button>
+      </div>
+    </form>
+  {% else %}
+    <p>{% trans "No email addresses associated with your account." %}</p>
+  {% endif %}
+
+  {% if can_add_email %}
+    <hr>
+    <div class="auth-header">
+      <h2>{% trans "Add Email Address" %}</h2>
+    </div>
+    <form method="post" action="{% url 'account_email' %}" class="auth-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          {{ form.email }}
+        </div>
+        {% if form.email.errors %}
+          <div class="error-message">{{ form.email.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <button type="submit" name="action_add" class="btn btn-primary btn-block">{% trans "Add Email" %}</button>
+    </form>
+  {% endif %}
+    {% comment %} <a href="{% url 'users:profile' %}" class="back-link">← Back to Profile</a> {% endcomment %}
+{% endblock %}
+
+{% block extra_body %}
+
+  <script data-allauth-onload="allauth.account.forms.manageEmailForm" type="application/json">
+    {
+      "i18n": {
+        "confirmDelete": "{% trans 'Do you really want to remove the selected email address?' %}"
+      }
+    }
+  </script>
+{% endblock %}

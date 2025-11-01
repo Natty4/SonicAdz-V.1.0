@@ -1,0 +1,69 @@
+{% extends "account/base_auth.html" %}
+{% load i18n allauth account %}
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block auth_content %}
+
+    <div class="auth-header">
+      <h1>{% trans "Login" %}</h1>
+      <p>{% trans "Access your account" %}</p>
+    </div>
+    {% if form.errors %}
+      <div class="error-message">
+        {{ form.errors|striptags|slice:"7:"  }}
+      </div>
+    {% endif %}
+    {% if not SOCIALACCOUNT_ONLY %}
+      {% url 'account_login' as login_url %}
+      <form method="post" action="{{ login_url }}" class="auth-form">
+        {% csrf_token %}
+
+        <div class="form-group{% if form.errors %} has-error{% endif %}">
+          <label for="{{ form.login.id_for_label }}">Phonenumber / {{ form.login.label }}</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            {{ form.login }}
+          </div>
+          {% for error in form.login.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group{% if form.errors %} has-error{% endif %}">
+          <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            {{ form.password }}
+          </div>
+          {% for error in form.password.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        {% if form.remember %}
+        <div class="form-group checkbox-wrapper">
+          {{ form.remember }} <label for="{{ form.remember.id_for_label }}">{{ form.remember.label }}</label>
+        </div>
+        {% endif %}
+
+        {{ redirect_field }}
+
+        <button type="submit" class="btn btn-primary btn-block">{% trans "Login" %}</button>
+
+        <div class="form-options mt-3">
+          <a href="{% url 'account_reset_password' %}" class="forgot-password">{% trans "Forgot password?" %}</a>
+        </div>
+
+      </form>
+
+      <div class="auth-footer mt-4">
+        <p>{% trans "Don’t have an account?" %} <a href="{% url 'account_signup' %}?user_type=advertiser">{% trans "Sign Up" %}</a></p>
+      </div>
+    {% endif %}
+
+    {% if SOCIALACCOUNT_ENABLED %}
+      <div class="auth-divider"><span>{% trans "or" %}</span></div>
+      {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+  
+{% endblock %}

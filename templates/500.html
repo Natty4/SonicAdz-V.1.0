@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Server Error
+{% endblock %}
+
+{% block extra_css %}
+
+    <style>
+        h1 {
+            font-size: 60px;
+            color: #d01277;
+        }
+        p {
+            font-size: 20px;
+        }
+        .error-card {
+            padding: 10px 20px;
+            max-width: 100%;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 25px 10px;
+            padding: 50px;
+            background-color: #f4f4f4;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div class="container card">
+            <div class="">
+                <h1>500</h1>
+                <h3>Internal Server Error</h3>
+                <p>Something went wrong on our end. Please try again later.</p>
+                <p><a href="/">Go back to the homepage</a></p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+

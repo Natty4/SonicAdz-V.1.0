@@ -1,0 +1,12 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<div class="app-analytics module">
+    <table>
+        <caption>
+            <a href="{% url 'sonic_admin:analytics-dashboard' %}" class="section">Analytics Dashboard</a>
+        </caption>
+    </table>
+</div>
+{{ block.super }}
+{% endblock %}

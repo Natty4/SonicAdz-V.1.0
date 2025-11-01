@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+{% load static i18n %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonicAdz - Hyper-Speed Telegram Ads</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/utilities.css'%}" />
+    <link rel="stylesheet" href="{% static 'css/landing.css'%}" />
+    {% comment %} <script defer src="{% static "js/scripts.js" %}"></script> {% endcomment %}
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <link rel="icon" href="{% static 'image/favicon.ico' %}" type="image/x-icon" />
+</head>
+<body>
+    <!-- SONIC PRELOADER -->
+    <div class="preloader" id="preloader">        
+        <div class="preload-sonic-portal">
+            <div class="portal-ring">
+                <div class="spark-container"></div>
+            </div>
+            <div class="emerald"></div>
+        </div>
+        <div class="loading-text">WARP SPEED ENGAGED</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content" style="display:none;">
+        <header>
+            <div class="container">
+                <div class="header-content">
+
+                <nav id="navbar">
+                    <!--  <ul class="nav-links">
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li class="demo-btn"><a href="#demo">Demo</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li> 
+                    <li><a href="#contact">Contact</a></li>
+                    </ul> -->
+                    <div class="hamburger" id="hamburger">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </nav>
+
+                <button class="cta-button" onclick="redirectToSignup('advertiser')">Launch Campaign</button>
+                </div>
+            </div>
+        </header>
+        <!-- FINAL CTA SECTION -->
+        <section class="final-cta" id="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Launch at Warp Speed?</h2>
+                    <p>Join thousands of advertisers reaching 10M+ Telegram users daily</p>
+                    <button id="join_btn" class="btn btn-primary btn-large" onclick="redirectToSignup('creator')">
+                        <i class="fas fa-rocket"></i> Join The Speed
+                        <div class="sonic-trail"></div>
+                    </button>
+                </div>
+                <div class="cta-rings">
+                    <div class="ring"></div>
+                    <div class="ring"></div>
+                    <div class="ring"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <div class="footer-logo">
+                            <div class="sonic-ring">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <span class="logo-text">SonicAdz.</span>
+                        </div>
+                        <p>Accelerating your ads to perfect audiences at Sonic speed. The fastest Telegram ad delivery platform in time.</p>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; SonicAdz. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden form for secure data submission -->
+    <form id="authForm" method="POST" action="{% url 'creator:process_telegram_auth' %}" style="display:none;">
+        {% csrf_token %}
+        <input type="hidden" name="init_data" id="initDataInput">
+    </form>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.getElementById('preloader');
+            const mainContent = document.getElementById('main-content');
+            const form = document.getElementById('authForm');
+            const initDataInput = document.getElementById('initDataInput');
+            const tg = window.Telegram?.WebApp;
+            const hasInitData = tg && tg.initData && tg.initData.length > 0;
+
+            preloader.style.display = 'flex';
+            mainContent.style.display = 'none';
+
+            if (hasInitData) {
+                try {
+                    tg.expand();
+                    tg.enableClosingConfirmation();
+                    const theme = tg.colorScheme || 'dark';
+                    document.documentElement.setAttribute('data-theme', theme);
+                    // Determine the header color based on the current theme
+                    let headerColor;
+                    if (theme === 'dark') {
+                        headerColor = '#15202b';
+                    } else {
+                        headerColor = '#ffffff';
+                    }
+
+                    // Set Telegram Mini App header color
+                    try {
+                        if (tg?.setHeaderColor) {
+                        tg.setHeaderColor(headerColor);
+                        }
+                    } catch (e) {
+                        console.warn("Failed to set Telegram header color:", e);
+                    }
+                    initDataInput.value = tg.initData;
+
+                    window.addEventListener('load', () => {
+                        const zoomPromise = triggerZoomOut();                    
+                    
+                        form.submit();
+
+                        zoomPromise.then(() => {
+                            document.body.style.overflow = '';
+                        });
+                    });
+
+                } catch (err) {
+                    console.error('Error submitting auth form:', err);
+                    window.location.href = "/auth/";
+                }
+
+            } else {
+                // For non-Telegram users, show full content after zoom
+                window.addEventListener('load', () => {
+                    triggerZoomOut().then(() => {
+                        mainContent.style.display = 'block';
+                        mainContent.classList.add('visible');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+
+            // Mini app button
+            document.getElementById("join_btn")?.addEventListener("click", () => {
+                const join = "sonicAdzBot";
+                const param = "sGo";
+                window.location.href = `https://t.me/${join}/${param}`;
+            });
+
+            function triggerZoomOut() {
+                return new Promise((resolve) => {
+                    const preloader = document.getElementById('preloader');
+                    const delayBeforeZoom = 1500; // spin time before zoom
+                    const zoomDuration = 1500;    // zoom animation time
+
+                    // Wait 1500ms (spin)
+                    setTimeout(() => {
+                        preloader.classList.add('zoom-out');
+
+                        setTimeout(() => {
+                            preloader.style.display = 'none';
+                            resolve();
+                        }, zoomDuration);
+
+                    }, delayBeforeZoom);
+                });
+            }
+        });
+    </script>
+    <script>
+        function redirectToSignup(userType) {
+        window.location.href = `accounts/signup/?user_type=${userType}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "advertiser/base.html" %}
+{% load i18n static %}
+<title>{% block title %}{{ request.user.first_name }} - Funds{% endblock %}</title>
+{% block dashboard_content %}
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="card center mt-1">
+                <h2>Deposit Funds</h2>
+                <p class="text-muted">Add funds to your wallet to start advertising.</p>
+                <div class="grid">
+                    <p class="text-muted card">Your current balance is ETB {{ wallet.balance }}.</p>
+                </div>
+                <div class="grid">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="amount">Amount: </label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-currency input-icon"></i>
+                                <input type="number" min='1' step="1" name="amount" required>
+                            </div>
+                            <small class="form-text text-muted text-xs">You can deposit any amount you wish, but please note that a minimum of the Initial Budget of your campaigns is required to start advertising.</small>
+
+                        </div>
+                        <button type="submit" class="btn btn-success">Deposit</button>
+                    </form>
+                </div>
+                <span class="flex flex-row  justify-between mt-4">
+                    <a href="{% url 'advertiser:wallet' %}" class="mt-4 btn">← Back</a>
+                </span>
+            </div>
+        </div>
+    </section>
+    
+{% endblock %}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+{% load i18n static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %} | SonicAdz.</title>
+  <link rel="stylesheet" href="{% static 'css/advertiser/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/utilities.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/advertiser/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'image/favicon.ico' %}" type="image/x-icon" />
+  {% block extra_styles %}{% endblock extra_styles %}
+</head>
+<body>
+  <div class="alert-messages">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <div class="page-wrapper dashboard-page">
+    {% block side_bar %}
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <a href="#">
+            <img src="{% static 'image/logo-2.png' %}" alt="SonicAdz Logo">
+          </a>
+        </div>
+        <button id="themeToggle">
+          <i class="fas"></i>
+        </button>
+        <button class="sidebar-close" aria-label="Close sidebar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav nav-tabs">
+        <ul>
+          {% comment %} <li>
+            <button id="create-campaign-btn" class="btn btn-primary">+ New Campaign</button>
+          </li> {% endcomment %}
+          <li class="active">
+            <a href="#overview" class="nav-tab active" data-tab="overview">
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9"></rect>
+                <rect x="14" y="3" width="7" height="5"></rect>
+                <rect x="14" y="12" width="7" height="9"></rect>
+                <rect x="3" y="16" width="7" height="5"></rect>
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li><a href="#campaigns" class="nav-tab" data-tab="campaigns"><i class="fas fa-bullhorn"></i> Campaigns</a></li>
+          {% comment %} <li><a href="#"><i class="fas fa-photo-film"></i> Creatives</a></li>
+          <li><a href="#"><i class="fas fa-users"></i> Audiences</a></li> {% endcomment %}
+          {% comment %} <li><a href="#"><i class="fa-solid fa-chart-column"></i> Report</a></li> {% endcomment %}
+          <li><a href="#billing" class="nav-tab" data-tab="billing"><i class="fas fa-credit-card"></i> Billing</a></li>
+
+          <li class="sidebar-dropdown">
+            <a href="#" class="dropdown-toggle">
+              <i class="fas fa-cog"></i><span>Settings</span>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="#profile">
+                  <i class="fas fa-user"></i>
+                  <span>Profile</span>
+                </a>
+              </li>
+              <li>
+                <a href="#balance">
+                  <i class="fas fa-wallet"></i> <span>Payment Methods</span>
+                </a>
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-bell"></i> <span>Notifications</span></a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="https://t.me/sonicAdzSupport/hello" class="sidebar-help"><i class="fas fa-headset"></i><span>Support</span></a>
+      </div>
+    </aside>
+    {% endblock %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+      {% block header %}
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="sidebar-toggle" aria-label="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="header-actions">
+            <button class="create-campaign-btn btn btn-sm btn-primary">+ New Campaign</button>
+          </div>
+        </div>
+        <div class="header-right">
+          {% comment %} <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search...">
+          </div> {% endcomment %}
+          
+          {% if request.user %}
+            <div class="header-actions">
+              <button class="action-btn notifications" aria-label="Notifications">
+                <i class="fas fa-bell"></i><span class="badge"></span>
+              </button>
+              <div class="user-dropdown">
+                <button class="user-dropdown-toggle">
+                  <div class="user-avatar"><i class="fas fa-user fa-2x"></i></div>
+                </button>
+                <div class="dropdown-menu">
+                  <a href="#profile">
+                    <i class="fas fa-user"></i><span class="user-name">{{ request.user }}</span>
+                  </a>
+                  <a href="#balance" class="nav-tab" data-tab="billing">
+                    <i class="fas fa-wallet"></i> Balance
+                    <span class="text-xs text-muted">ETB {{request.user.balance.available|default:0}}</span>
+                  </a>
+                  <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                  <div class="dropdown-divider"></div>
+                  <a href="/accounts/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </header>
+      {% endblock header %}
+
+      <div class="dashboard-content">
+        {% block dashboard_content %}{% endblock dashboard_content %}
+      </div>
+    </main>
+  </div>
+
+  {% block footer %}{% endblock footer %}
+
+  <script src="{% static 'js/advertiser/navigation.js' %}"></script>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const savedTheme = localStorage.getItem('theme');
+    const defaultTheme = 'dark';
+    const currentTheme = savedTheme || defaultTheme;
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    themeIcon.classList.add(currentTheme === 'dark' ? 'fa-sun' : 'fa-moon');
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const newTheme = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeIcon.classList.toggle('fa-sun', newTheme === 'dark');
+      themeIcon.classList.toggle('fa-moon', newTheme === 'light');
+    });
+  </script>
+  {% block extra_scripts %}{% endblock extra_scripts %}
+</body>
+</html>

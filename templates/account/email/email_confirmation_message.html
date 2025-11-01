@@ -1,0 +1,50 @@
+<div style="
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #15202b;
+  color: #e9f5fe;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #2f3336;
+">
+    <p style="font-size: 18px; color: #e9f5fe;">
+        Hello <strong style="color: #e9f5fe;">{{ user.username }},</strong>
+    </p>
+
+    <p style="color: #8899a6;">Thank you for signing up! Please confirm your email address by clicking the button below:</p>
+
+    <p>
+        <a href="{{ activate_url }}" 
+            style="
+                display: inline-block;
+                background-color: #1c88fbff;
+                color: #ffffff;
+                text-decoration: none;
+                padding: 12px 20px;
+                font-size: 16px;
+                border-radius: 5px;
+                margin-top: 10px;
+                cursor: pointer;
+            ">
+            Confirm Email Address
+        </a>
+    </p>
+
+    <p style="color: #90b0c8ff;">
+        If the button doesn't work, you can also copy and paste the following link into your browser:
+    </p>
+
+    <p><a href="{{ activate_url }}">{{ activate_url }}</a></p>
+
+    <br>
+
+    <p style="font-size: 13px; color: #888;">If you did not sign up for this account, you can ignore this email.</p>
+
+    <p style="margin-top: 40px; color: #8899a6;">
+        The <strong style="color: #e9f5fe;">SonicAdz.</strong> Team
+    </p>
+
+
+</div>

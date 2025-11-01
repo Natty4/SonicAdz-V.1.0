@@ -1,0 +1,18 @@
+Hello from SonicAdz.
+
+You are receiving this email because you, or someone else, tried to access an account with the email:
+{{ email }}
+
+However, we do not have any record of such an account in our database.
+
+This email can be safely ignored if you did not initiate this action.
+
+If it was you, you can sign up for an account by clicking the link below:
+
+Sign Up Link:
+{{ signup_url }}
+
+If you are having trouble with the link, please copy and paste it into your browser.
+
+Thanks,
+The SonicAdz. Team

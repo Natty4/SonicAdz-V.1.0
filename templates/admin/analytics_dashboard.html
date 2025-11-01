@@ -1,0 +1,513 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .chart-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .chart-box {
+        flex: 1;
+        min-width: 300px;
+        padding: 1rem;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .chart-box.full-width {
+        flex: 100%;
+    }
+    .chart-box.half-width {
+        flex: 0 0 calc(50% - 1rem); /* Subtract gap to fit nicely */
+    }
+
+    .chart-title {
+        margin-top: 0;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 300px !important;
+    }
+
+    .download-csv {
+        position: ;
+    }
+
+    .download-csv button {
+        
+        top: -1rem;
+        right: 10px;
+        padding: 0.5rem;
+        border: 1px solid gray;
+    }
+
+     .download-csv-2 {
+        position: ;
+    }
+
+    .download-csv-2 button {
+        
+        top: -4rem;
+        right: 10px;
+        padding: 0.5rem;
+        border: 1px solid gray;
+    }
+    .mt-4 {
+        margin-top: 0.5rem;
+    }
+    .mb-4 {
+        margin-bottom: 0.5rem;
+    }
+    p.total-reach-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #27ae60;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <form method="get" class="mb-4">
+        <label for="range">Date Range:</label>
+        <select name="range" id="range" onchange="this.form.submit()">
+            <option value="7" {% if selected_range == "7" %}selected{% endif %}>Last 7 Days</option>
+            <option value="30" {% if selected_range == "30" %}selected{% endif %}>Last 30 Days</option>
+            <option value="90" {% if selected_range == "90" %}selected{% endif %}>Last 90 Days</option>
+        </select>
+    </form>
+
+    <form method="get" class="mt-4 mb-4">
+        <label for="language">language:</label>
+        <select name="language" id="language" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for ln in all_languages %}
+                <option value="{{ ln.id }}" {% if selected_language == ln.id|stringformat:"s" %}selected{% endif %}>{{ ln.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <form method="get" action="{% url 'sonic_admin:analytics-export-csv' %}" class="mb-4 download-csv">
+        <input type="hidden" name="range" value="{{ selected_range }}">
+        <button type="submit" class="btn btn-primary">Download CSV</button>
+    </form>
+
+    <form method="get" action="{% url 'sonic_admin:analytics-export-csv' %}" class="mb-4 download-csv-2">
+        <input type="hidden" name="range" value="{{ selected_range }}">
+        <input type="hidden" name="type" value="telegram_visitors">
+        <button type="submit" class="btn btn-secondary">Download Telegram Visitors CSV</button>
+    </form>
+
+<div class="chart-container">
+
+    <section class="chart-box full-width" aria-labelledby="totalReachStat">
+        <h3 id="totalReachStat" class="chart-title">Total Potential Reach</h3>
+        <p class="total-reach-number">{{ total_current_reach }}</p>
+    </section>
+
+    <section class="chart-box full-width" aria-labelledby="reachChartTitle">
+        <h3 id="reachChartTitle" class="chart-title">Total Audience Reach Over Time</h3>
+        <canvas id="reachChart"></canvas>
+    </section>
+
+    <section class="chart-box" aria-labelledby="telegramVisitorsTitle">
+        <h3 id="telegramVisitorsTitle" class="chart-title">Telegram Visitors (last {{ selected_range }} days)</h3>
+        <canvas id="telegramVisitorsChart" aria-label="Line chart showing Telegram visitors over time"></canvas>
+    </section>
+
+    <section class="chart-box" aria-labelledby="deviceChartTitle">
+        <h3 id="deviceChartTitle" class="chart-title">Device Type Breakdown</h3>
+        <canvas id="deviceChart" role="img" aria-label="Pie chart showing device type breakdown"></canvas>
+    </section>
+
+    <section class="chart-box" aria-labelledby="premiumUsersTitle">
+        <h3 id="premiumUsersTitle" class="chart-title">Premium Telegram Users</h3>
+        <p>Premium: {{ premium_count }} | Non-Premium: {{ non_premium_count }}</p>
+    </section>
+
+    <!-- Daily Active Users -->
+    <section class="chart-box" aria-labelledby="dailyActiveTitle">
+        <h3 id="dailyActiveTitle" class="chart-title">Daily Active Users</h3>
+        <canvas id="dailyActiveChart"></canvas>
+    </section>
+
+    <section class="chart-box" aria-labelledby="userChartTitle">
+        <h3 id="userChartTitle" class="chart-title">User Types Distribution</h3>
+        <canvas id="userChart" role="img" aria-label="Bar chart showing user types distribution"></canvas>
+    </section>
+    
+    <section class="chart-box" aria-labelledby="categoryChartTitle">
+        <h3 id="categoryChartTitle" class="chart-title">Channel Categories Distribution</h3>
+        <canvas id="categoryChart" role="img" aria-label="Pie chart showing channel categories distribution"></canvas>
+    </section>
+
+    <section class="chart-box" aria-labelledby="languageChartTitle">
+        <h3 id="languageChartTitle" class="chart-title">Channel Distribution by Language</h3>
+        <canvas id="languageChart"></canvas>
+    </section>
+
+    <section class="chart-box full-width" aria-labelledby="userGrowthTitle">
+        <h3 id="userGrowthTitle" class="chart-title">User Growth Over Time</h3>
+        <canvas id="userGrowthChart"></canvas>
+    </section>
+
+    <!-- Channels Created Over Time -->
+    <section class="chart-box full-width" aria-labelledby="channelsOverTimeTitle">
+        <h3 id="channelsOverTimeTitle" class="chart-title">Channels Created Over Time</h3>
+        <canvas id="channelsOverTimeChart"></canvas>
+    </section>
+
+    <section class="chart-box half-width" aria-labelledby="paymentMethodsTitle">
+        <h3 id="paymentMethodsTitle" class="chart-title">User Payment Methods</h3>
+        <canvas id="paymentMethodsChart"></canvas>
+    </section>
+</div>
+
+<!-- Debug info (only shown on error) -->
+<div id="chartDebug" style="display: none; color: red;">
+    <p><strong>Debug Info:</strong></p>
+    <p>User Labels: {{ user_labels }}</p>
+    <p>User Data: {{ user_data }}</p>
+    <p>Category Labels: {{ category_labels }}</p>
+    <p>Category Data: {{ category_data }}</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const theme = document.documentElement.getAttribute('data-theme');
+        const isDarkMode = theme && (theme.toLowerCase() === 'dark' || theme.toLowerCase() === 'auto');
+
+            const userLabels = {{ user_labels|safe }};
+            const userData = {{ user_data|safe }};
+        const userGrowthLabels = {{ user_growth_labels|safe }};
+        const userGrowthData = {{ user_growth_data|safe }};
+        const categoryLabels = {{ category_labels|safe }};
+        const categoryData = {{ category_data|safe }};
+        const dailyActiveLabels = {{ daily_active_labels|safe }};
+        const dailyActiveData = {{ daily_active_data|safe }};
+        const channelLabels = {{ channel_labels|safe }};
+        const channelData = {{ channel_data|safe }};
+        const languageLabels = {{ language_labels|safe }};
+        const languageCounts = {{ language_counts|safe }};
+        const payment_method_labels = {{ payment_method_labels|safe }};
+        const payment_method_counts = {{ payment_method_counts|safe }};
+
+        const commonDarkOptions = {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: isDarkMode ? '#e0e0e0' : '#333'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: isDarkMode ? '#ccc' : '#333'
+                    },
+                    grid: {
+                        color: isDarkMode ? '#272727' : '#eee',
+                        borderWidth: 0.1
+                    }
+                },
+                y: {
+                    beginAtZero: true, 
+                    min: 0,
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1,
+                        precision: 0,
+                        callback: value => Number.isInteger(value) ? value : null,
+                        color: isDarkMode ? '#ccc' : '#333'
+                    },
+                    grid: {
+                        color: isDarkMode ? '#272727' : '#eee',
+                        borderWidth: 0.01
+                    }
+                }
+            }
+        };
+
+        const reachCtx = document.getElementById('reachChart');
+        if (reachCtx && {{ reach_labels|length }} > 0) {
+            new Chart(reachCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ reach_labels|safe }},
+                    datasets: [{
+                        label: 'Total Audience Reach',
+                        data: {{ reach_data|safe }},
+                        fill: true,
+                        borderColor: '#30b33fff',
+                        backgroundColor: 'rgba(89, 182, 105, 0.2)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    ...commonDarkOptions
+                }
+            });
+        }
+
+        const ctxVisitors = document.getElementById('telegramVisitorsChart').getContext('2d');
+        new Chart(ctxVisitors, {
+            type: 'line',
+            data: {
+                labels: {{ visitor_labels|safe }},
+                datasets: [{
+                    label: 'Telegram Visitors',
+                    data: {{ visitor_data|safe }},
+                    borderColor: '#00c0ef',
+                    backgroundColor: 'rgba(0, 192, 239, 0.1)',
+                    fill: true,
+                }]
+            },
+            options: {
+                ...commonDarkOptions
+            }
+        });
+
+        const ctxDevice = document.getElementById('deviceChart').getContext('2d');
+        new Chart(ctxDevice, {
+            type: 'pie',
+            data: {
+                labels: {{ device_labels|safe }},
+                datasets: [{
+                    data: {{ device_counts|safe }},
+                    backgroundColor: ['#f39c12', '#00a65a', '#f56954', '#3c8dbc']
+                }]
+            }
+        });
+
+        // User Chart
+        const userCtx = document.getElementById('userChart');
+        if (userCtx && userLabels.length && userData.length) {
+            new Chart(userCtx, {
+                type: 'bar',
+                data: {
+                    labels: userLabels,
+                    datasets: [{
+                        label: 'Users',
+                        data: userData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        barThickness: 90,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    ...commonDarkOptions
+                }
+            });
+        }
+
+        // User Growth Chart
+        const userGrowthCtx = document.getElementById('userGrowthChart');
+        if (userGrowthCtx && userGrowthLabels.length) {
+            new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: userGrowthLabels,
+                    datasets: [{
+                        label: 'New Users',
+                        data: userGrowthData,
+                        fill: true,
+                        borderColor: '#36A2EB',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    ...commonDarkOptions
+                }
+            });
+        }
+
+        // Category Chart (pie — no y-axis)
+        const categoryCtx = document.getElementById('categoryChart');
+        if (categoryCtx && categoryLabels.length && categoryData.length) {
+            const backgroundColors = [
+                '#FF6384', '#36A2EB', '#FFCE56', 
+                '#4BC0C0', '#9966FF', '#FF9F40',
+                '#7E57C2', '#26A69A', '#EF5350', '#AB47BC'
+            ];
+
+            new Chart(categoryCtx, {
+                type: 'pie',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryData,
+                        backgroundColor: backgroundColors.slice(0, categoryData.length),
+                        borderWidth: 1,
+                        borderColor: isDarkMode ? '#2c2c2c' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isDarkMode ? '#e0e0e0' : '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Daily Active Users Chart
+        const dailyActiveCtx = document.getElementById('dailyActiveChart');
+        if (dailyActiveCtx && dailyActiveLabels.length) {
+            new Chart(dailyActiveCtx, {
+                type: 'bar',
+                data: {
+                    labels: dailyActiveLabels,
+                    datasets: [{
+                        label: 'Active Users',
+                        data: dailyActiveData,
+                        backgroundColor: '#4BC0C0',
+                        barThickness: 60,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    ...commonDarkOptions
+                }
+            });
+        }
+
+        // Channels Created Over Time Chart
+        const channelsOverTimeCtx = document.getElementById('channelsOverTimeChart');
+        if (channelsOverTimeCtx && channelLabels.length) {
+            new Chart(channelsOverTimeCtx, {
+                type: 'line',
+                data: {
+                    labels: channelLabels,
+                    datasets: [{
+                        label: 'New Channels',
+                        data: channelData,
+                        fill: true,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: '#FF9F40',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    ...commonDarkOptions
+                }
+            });
+        }
+
+        // Language Chart (doughnut — no y-axis)
+        const languageChartCtx = document.getElementById('languageChart');
+        if (languageChartCtx && languageLabels.length) {
+            new Chart(languageChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: languageLabels,
+                    datasets: [{
+                        data: languageCounts,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                            '#9966FF', '#FF9F40', '#7E57C2', '#26A69A',
+                            '#EF5350', '#AB47BC'
+                        ],
+                        borderWidth: 1,
+                        borderColor: isDarkMode ? '#2c2c2c' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isDarkMode ? '#e0e0e0' : '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const paymentMethodCtx = document.getElementById('paymentMethodsChart');
+        if (paymentMethodCtx && payment_method_labels.length && payment_method_counts.length) {
+            new Chart(paymentMethodCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: payment_method_labels,
+                    datasets: [{
+                        data: payment_method_counts,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                            '#9966FF', '#FF9F40', '#7E57C2', '#26A69A',
+                            '#EF5350', '#AB47BC'
+                        ],
+                        borderWidth: 1,
+                        borderColor: isDarkMode ? '#2c2c2c' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isDarkMode ? '#e0e0e0' : '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+    } catch (e) {
+        console.error('Chart rendering failed:', e);
+        const debug = document.getElementById('chartDebug');
+        if (debug) debug.style.display = 'block';
+    }
+});
+</script>
+
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+
+{% endblock %}

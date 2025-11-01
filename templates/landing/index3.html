@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+{% load static i18n %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% comment %} <meta name="telegram-web-app-bot-domain" content="yourdomain.com"> {% endcomment %}
+    <title>SonicAdz - Hyper-Speed Telegram Ads</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/utilities.css'%}" />
+    <link rel="stylesheet" href="{% static 'css/landing.css'%}" />
+    <script defer src="{% static "js/scripts.js" %}"></script>
+    <script defer src="{% static "js/preload.js" %}"></script>
+
+    <!-- Telegram WebApp JS -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+ 
+</head>
+<body>
+    <div id="bg">
+        <!-- STARFIELD BACKGROUND -->
+        <div class="stars" id="stars"></div>
+        
+        <!-- DISTANT PLANETS -->
+        <div class="planet" style="width: 300px; height: 300px; background: radial-gradient(circle, #1a1a4a, transparent); top: 10%; right: 5%;"></div>
+        <div class="nebula" style="width: 400px; height: 400px; top: 60%; left: 10%;"></div>
+        <div class="planet" style="width: 150px; height: 150px; background: radial-gradient(circle, #4a1a1a, transparent); bottom: 10%; left: 8%;"></div>
+    </div>
+    <!-- SONIC PRELOADER -->
+    <div class="preloader" id="preloader">
+        <!-- Sonic Rings and Speed Elements -->
+        <div class="sonic-elements">
+            <div class="sonic-rings sonic-floating-ring-2">
+                <div class="ring-inner"></div>
+                <div class="ring-glow"></div>
+            </div>
+            <div class="sonic-rings sonic-floating-ring-3">
+                <div class="ring-inner"></div>
+                <div class="ring-glow"></div>
+            </div>
+            <div class="speed-burst speed-burst-1"></div>
+            <div class="speed-burst speed-burst-2"></div>
+        </div>
+        <div class="preload-sonic-portal">
+            <div class="portal-ring">
+                <div class="spark-container">
+                    <!-- We'll spawn sparks dynamically -->
+                </div>
+            </div>
+            <div class="emerald"></div>
+        </div>
+        <div class="loading-text">WARP SPEED ENGAGED</div>
+    </div>
+
+     <!-- MAIN CONTENT -->
+    <div id="main-content">
+        <!-- HEADER -->
+        <header>
+            <div class="container">
+                <div class="header-content">
+                <div class="logo">
+                    <div class="sonic-ring">
+                    <i class="fas fa-bolt"></i>
+                    </div>
+                    <span class="logo-text">SonicAdz.</span>
+                </div>
+
+                <nav id="navbar">
+                    <ul class="nav-links">
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li class="demo-btn"><a href="#demo">Demo</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <!-- <li><a href="#pricing">Pricing</a></li> -->
+                    <li><a href="#contact">Contact</a></li>
+                    </ul>
+                    <div class="hamburger" id="hamburger">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </nav>
+                <span class="text-muted tooltip-icon" data-tooltip="🏵️ We're building this feature! 'Launch Campaign' will be live soon.">
+                    <button class="cta-button">Launch Campaign</button>
+                </span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>
+                        Accelerate Your Ads at
+                        <span class="sonic-speed-text">Sonic Speed</span>
+                    </h1>
+                    <p>Supercharge your Telegram campaigns with our lightning-fast AI matching algorithm. Watch your ads zip through channels at supersonic velocity!</p>
+                    
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="get_started">Get Started</button>
+                        <button class="btn btn-secondary demo-btn" id="demo-btn">
+                            <i class="fas fa-play"></i> Watch Demo
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="hero-rings">
+                    <div class="hero-ring"></div>
+                    <div class="hero-ring"></div>
+                    <div class="hero-ring"></div>
+                </div>
+
+                <!-- Sonic Rings and Speed Elements -->
+                <div class="sonic-elements">
+                    <div class="sonic-rings sonic-floating-ring-1">
+                        <div class="ring-inner"></div>
+                        <div class="ring-glow"></div>
+                    </div>
+                    <div class="sonic-rings sonic-floating-ring-2">
+                        <div class="ring-inner"></div>
+                        <div class="ring-glow"></div>
+                    </div>
+                    <div class="sonic-rings sonic-floating-ring-3">
+                        <div class="ring-inner"></div>
+                        <div class="ring-glow"></div>
+                    </div>
+                    <div class="speed-burst speed-burst-1"></div>
+                    <div class="speed-burst speed-burst-2"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- HOW IT WORKS SECTION -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Our Sonic Delivery Process</h2>
+                    <p>Lightning-fast ad delivery in just 4 steps</p>
+                </div>
+
+                <div class="steps-track">
+                    <!-- <div class="track-line"></div> -->
+                    <div class="steps-grid">
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i class="fas fa-upload"></i>
+                                <div class="icon-glow"></div>
+                            </div>
+                            <h3>Hyper Upload</h3>
+                            <p>Blast your ads into our warp-speed system</p>
+                            <div class="step-connector"></div>
+                        </div>
+                        
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i class="fas fa-crosshairs"></i>
+                                <div class="icon-glow"></div>
+                            </div>
+                            <h3>AI Targeting</h3>
+                            <p>Our neural network analyzes 50+ parameters</p>
+                            <div class="step-connector"></div>
+                        </div>
+                        
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i class="fas fa-bolt"></i>
+                                <div class="icon-glow"></div>
+                            </div>
+                            <h3>Quantum Matching</h3>
+                            <p>Instant pairing with perfect channels</p>
+                            <div class="step-connector"></div>
+                        </div>
+                        
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i class="fas fa-rocket"></i>
+                                <div class="icon-glow"></div>
+                            </div>
+                            <h3>Warp Delivery</h3>
+                            <p>Ads reach audiences faster than light</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Animated ad flow visualization -->
+                <div class="sonic-flow">
+                    <div class="flow-track"></div>
+                    <div class="flow-ad">
+                        <i class="fas fa-ad"></i>
+                        <div class="ad-trail"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEMO SECTION -->
+        <section class="demo-section" id="demo">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Sonic Ad Delivery</h2>
+                    <p>Experience our hyper-speed matching system</p>
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-controls">
+                        <div class="control-group">
+                            <h3>Targeting Rules</h3>
+                            <div class="form-group">
+                                <label>Max CPM (ETB)</label>
+                                <span class="text-muted tooltip-icon" data-tooltip="The highest Cost Per 1000 Impressions you're willing to pay for this channel, Birr.">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <input type="range" id="cpm-slider" min="1" max="10" value="5" step="0.5">
+                                <div class="slider-value">ETB<span id="cpm-value">5.0</span></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Select Niche (Max 3)</label>
+                                <span class="text-muted tooltip-icon" data-tooltip="Pick up to 3 audience categories you want your ads to target. This helps us match your campaign with the most relevant channels.">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <div class="badge-container" id="niche-badges">
+                                    <div class="badge" data-niche="crypto">Crypto</div>
+                                    <div class="badge" data-niche="gaming">Gaming</div>
+                                    <div class="badge" data-niche="tech">Tech</div>
+                                    <div class="badge" data-niche="finance">Finance</div>
+                                    <div class="badge" data-niche="health">Health</div>
+                                    <div class="badge" data-niche="news">News</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Select Language</label>
+                                <span class="text-muted tooltip-icon" data-tooltip="Choose the language(s) your target audience speaks. We'll prioritize showing your ads in channels that use these languages.">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <div class="badge-container" id="language-badges">
+                                    <div class="badge" data-language="english">English</div>
+                                    <div class="badge" data-language="amharic">Amharic</div>
+                                    <div class="badge" data-language="oromo">Oromo</div>
+                                    <div class="badge" data-language="tigrinya">Tigrinya</div>
+                                    <div class="badge" data-language="soomaali">Af Soomaali</div>
+                                    <div class="badge" data-language="qafaraf">Qafaraf</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="launch-button" id="launch-button" disabled>
+                            <i class="fas fa-rocket"></i> Launch Ad Campaign
+                        </button>
+
+                        
+                        <div class="demo-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="channels-matched">0</div>
+                                <div class="stat-label">Channels Matched</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="delivery-speed">0ms</div>
+                                <div class="stat-label">Delivery Speed</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="match-accuracy">0%</div>
+                                <div class="stat-label">Match Accuracy</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="demo-visualization">
+                        <div class="sonic-portal-container" id="portal-container">
+                            <div class="sonic-portal">
+                                <div class="portal-ring outer-ring"></div>
+                                <div class="portal-ring middle-ring"></div>
+                                <div class="portal-ring inner-ring"></div>
+                                <div class="portal-core"></div>
+
+                                <div class="portal-spark spark1"></div>
+                                <div class="portal-spark spark2"></div>
+                                <div class="portal-spark spark3"></div>
+                                <div class="portal-spark spark4"></div>
+                                <div class="portal-spark spark5"></div>
+                            </div>
+
+                            <div class="ad-preview" id="ad-preview">
+                                <div class="ad-content">
+                                    <div class="ad-image">
+                                        <img src="https://www.gamereactor.eu/media/42/sonichedgehog3_4454293b.jpg" style="width:100%; height:100%">
+                                    </div>
+                                    <div class="ad-text">Your Ad Here</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="telegram-network" id="telegram-network">
+                            <!-- Grid generated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="matched-channels">
+                        <div id="reached-counter" style="margin: 10px; font-weight: bold; color:00e47a">
+                            Reached Users: <span id="reached-count" style="color:#00e47a">0</span>
+                        </div>
+                        <p style="color: #ff2d8f; animation: bounce 0.6s ease infinite alternate;"><i class="fas fa-arrow-down"></i></p>
+                        <h5>Top Matched Channels (6 Total - 90% Reach Target)</h5>
+                        <div class="channel-list">
+                            <!-- Channels will be generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section class="features-section" id="features">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Sonic Features</h2>
+                    <p>Experience the power of hyper-speed ad delivery</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>Lightning Matching</h3>
+                        <p>Our algorithm matches your ads with perfect channels in milliseconds using advanced AI and Sonic-speed processing.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <h3>Precision Targeting</h3>
+                        <p>Target by niche, language, demographics, and more with surgical precision to reach your ideal audience.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3>Real-Time Analytics</h3>
+                        <p>Track your campaign performance in real-time with our comprehensive dashboard and Sonic-speed reporting.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>Automated Optimization</h3>
+                        <p>Our AI continuously optimizes your campaigns for maximum performance while you focus on your business.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Fraud Protection</h3>
+                        <p>Advanced algorithms detect and prevent fraudulent activity, ensuring your budget reaches real audiences.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-infinity"></i>
+                        </div>
+                        <h3>Unlimited Scaling</h3>
+                        <p>From small campaigns to massive deployments, our system scales effortlessly to meet your needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING SECTION -->
+
+        <!-- CONTACT SECTION -->
+        <section class="contact-section" id="contact">
+            <div class="container">
+                <div class="section-title">
+                <h2>Contact Us</h2>
+                <p>Let’s connect and grow your reach.</p>
+                </div>
+
+                <div class="contact-cards">
+                <div class="contact-card">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                    <h4>Email</h4>
+                    <a href="mailto:support@sonicadz.com">support@sonicadz.com</a>
+                    </div>
+                </div>
+
+                <div class="contact-card">
+                    <i class="fab fa-telegram-plane"></i>
+                    <div>
+                    <h4>Telegram</h4>
+                    <a href="https://t.me/SonicAdzBot" target="_blank">@SonicAdzBot</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL CTA SECTION -->
+        <section class="final-cta" id="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Launch at Warp Speed?</h2>
+                    <p>Join thousands of advertisers reaching 10M+ Telegram users daily</p>
+                    <button id="join_btn"  class="btn btn-primary btn-large">
+                        <i class="fas fa-rocket"></i> Join The Speed
+                        <div class="sonic-trail"></div>
+                    </button>
+                </div>
+                
+                <div class="cta-rings">
+                    <div class="ring"></div>
+                    <div class="ring"></div>
+                    <div class="ring"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <div class="footer-logo">
+                            <div class="sonic-ring">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <span class="logo-text">SonicAdz</span>
+                        </div>
+                        <p>Accelerating your ads to perfect audiences at Sonic speed. The fastest Telegram ad delivery platform in time.</p>
+                    </div>
+                    
+                    {% comment %} <div class="footer-links">
+                        <h3>Platform</h3>
+                        <ul>
+                            <li><a href="#">Features</a></li>
+                            <li><a href="#">Pricing</a></li>
+                            <li><a href="#">API</a></li>
+                            <li><a href="#">Integrations</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <h3>Resources</h3>
+                        <ul>
+                            <li><a href="#">Documentation</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Case Studies</a></li>
+                            <li><a href="#">Help Center</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <h3>Company</h3>
+                        <ul>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Legal</a></li>
+                        </ul>
+                    </div> {% endcomment %}
+                </div>
+                
+                <div class="footer-bottom">
+                    <p>&copy; SonicAdz. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- Hidden form for secure data submission -->
+    <form id="authForm" method="POST" action="{% url 'creator:process_telegram_auth' %}" style="display:none;">
+        {% csrf_token %}
+        <input type="hidden" name="init_data" id="initDataInput">
+    </form>
+
+
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.getElementById('preloader');
+            const mainContent = document.getElementById('main-content');
+            const starBg = document.getElementById('bg');
+            const form = document.getElementById('authForm');
+            const initDataInput = document.getElementById('initDataInput');
+
+            // Always show preloader initially
+            preloader.style.display = 'flex';
+            mainContent.style.display = 'none';
+            starBg.style.display = 'none';
+            
+
+            const tg = window.Telegram?.WebApp;
+            const hasInitData = tg && tg.initData && tg.initData.length > 0;
+
+            if (hasInitData) {
+                try {
+                    tg.expand();
+                    tg.enableClosingConfirmation();
+
+                    const theme = tg.colorScheme || 'dark';
+                    document.documentElement.setAttribute('data-theme', theme);
+
+                    initDataInput.value = tg.initData;
+
+                    window.addEventListener('load', () => {
+                        const zoomPromise = triggerZoomOut();
+
+                        
+                        setTimeout(() => {
+                            form.submit();
+                        }, 1500);
+
+                        
+                        zoomPromise.then(() => {
+                            document.body.style.overflow = '';
+                        });
+                    });
+
+                } catch (err) {
+                    console.error('Error submitting auth form:', err);
+                    window.location.href = "/auth/";
+                }
+            } else {
+                window.addEventListener('load', () => {
+                    triggerZoomOut().then(() => {
+                        mainContent.style.display = 'block';
+                        starBg.style.display = 'block';
+                        mainContent.classList.add('visible');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+
+            // Telegram mini app button
+            document.getElementById("join_btn")?.addEventListener("click", () => {
+                const join = "sonicAdzBot";
+                const param = "sGo";
+                window.location.href = `https://t.me/${join}/${param}`;
+            });
+        });
+
+        function triggerZoomOut() {
+            return new Promise((resolve) => {
+                const preloader = document.getElementById('preloader');
+                const delayBeforeZoom = 1500; // spin time before zoom
+                const zoomDuration = 1500;    // zoom animation time
+
+                // Wait 1500ms (spin)
+                setTimeout(() => {
+                    // Start zoom out animation
+                    preloader.classList.add('zoom-out');
+
+                    // After zoom animation completes, remove preloader and resolve promise
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                        resolve();
+                    }, zoomDuration);
+
+                }, delayBeforeZoom);
+            });
+        }
+    </script>
+</body>
+</html>

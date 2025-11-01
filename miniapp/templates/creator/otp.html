@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP{% endblock %}
+
+{% block content %}
+<section>
+    <div class="otp-container">
+        <h1>⚡ </h1>
+        <h2>Just One More Step</h2>
+        <p class="mt-3">We’ve sent a 6-digit code to {{ display_phone }} on Telegram. Enter it below to continue.</p>
+        
+        <form id="otp-form" class="otp-form">
+            {% csrf_token %}
+            <div class="otp-inputs">
+                <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" minlength="6" pattern="\d{6}" required>
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <button type="submit" id="verif_btn" class="btn btn-block btn-primary mt-4 cursor-pointer">Verify</button>
+        </form>
+        
+        <div class="otp-resend">
+            <button id="resend-btn" class="btn btn-link mt-2 cursor-pointer" disabled>
+                Resend OTP <span id="countdown">( 60s )</span>
+            </button>
+        </div>
+        
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("otp-form");
+        const errorBox = document.getElementById("error-message");
+        const verifyBtn = form.querySelector("button[type='submit']");
+        const resendBtn = document.getElementById("resend-btn");
+        const countdownEl = document.getElementById("countdown");
+        
+
+    
+
+        function clearErrorBox() {
+            if (errorBox.textContent.trim() !== "") {
+                errorBox.textContent = "";
+                verifyBtn.disabled = false;
+            }
+        }
+        
+        let resendCooldown = 60;
+        const tg = window.Telegram?.WebApp;
+        
+        // Apply Telegram theme if in WebApp
+        if (tg) {
+            tg.expand();
+            tg.enableClosingConfirmation();
+            
+            const theme = tg.colorScheme || "dark";
+            document.documentElement.setAttribute("data-theme", theme);
+        }
+        
+        document.addEventListener("visibilitychange", async () => {
+            if (document.visibilityState === "visible") {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const otpInput = document.querySelector("input[name='otp']");
+                    const otpPattern = /^\d{6}$/;
+
+                    if (otpPattern.test(text)) {
+                        otpInput.value = text;
+
+                        // Auto-submit if desired
+                        form.requestSubmit();
+
+                        // Trigger a small vibration or haptic feedback
+                        if (tg?.HapticFeedback) {
+                            tg.HapticFeedback.impactOccurred("light");
+                        }
+                    }
+                } catch (err) {
+                    console.warn("Clipboard access denied or unavailable:", err);
+                }
+            }
+        });
+
+        // Handle form submission
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            verifyBtn.disabled = true;
+
+            const formData = new FormData(form);
+            
+            try {
+                togglePreloader(true);
+                const response = await fetch("{% url 'creator:otp_verify' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                verifyBtn.innerHTML = '<span class="text-brand"><i class="fas fa-spinner fa-spin"> </i> Verifying...</span>';
+                if (data.success) {
+                    if (tg) {
+                        tg.HapticFeedback.notificationOccurred("success");
+                    }
+                    
+                    window.location.href = data.redirect_url;
+                } else {
+                    verifyBtn.innerHTML = '<span>Verify</span>';
+                    verifyBtn.disabled = true; 
+                    errorBox.textContent = data.error || "Verification failed";
+                    if (tg) {
+                        tg.HapticFeedback.notificationOccurred("error");
+                    }
+                }
+            } catch (error) {
+                errorBox.textContent = "Network error. Please try again.";
+            }
+            finally {
+                togglePreloader(false);
+            }
+        });
+        
+        // Handle resend OTP
+        resendBtn.addEventListener("click", async () => {
+            clearErrorBox();
+            resendBtn.disabled = true;
+
+            // Show temporary "Sending..." message
+            countdownEl.textContent = " ...";
+
+            try {
+                const response = await fetch("{% url 'creator:otp_resend' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resendCooldown = 60;
+                    updateResendTimer();
+                    if (tg) {
+                        tg.HapticFeedback.notificationOccurred("success");
+                    }
+                } else {
+                    errorBox.textContent = data.error || "Failed to resend OTP";
+                    countdownEl.textContent = ""; // fallback
+                    resendBtn.disabled = false;
+                    if (tg) {
+                        tg.HapticFeedback.notificationOccurred("error");
+                    }
+                }
+            } catch (error) {
+                errorBox.textContent = "Network error. Please try again.";
+                countdownEl.textContent = ""; // fallback
+                resendBtn.disabled = false;
+            }
+        });
+        
+        // Update resend timer
+        function updateResendTimer() {
+            // countdownEl.textContent = resendCooldown;
+            resendBtn.disabled = true;
+            
+            if (resendCooldown > 0) {
+                countdownEl.textContent = `(${resendCooldown}s)`;
+                resendCooldown--;
+                setTimeout(updateResendTimer, 1000);
+            } else {
+                countdownEl.textContent = "";
+                resendBtn.disabled = false;
+            }
+        }
+        
+        // Start the countdown
+        updateResendTimer();
+
+        const otpInput = document.querySelector("input[name='otp']");
+        otpInput.addEventListener("input", clearErrorBox);
+
+
+        function togglePreloader(show, removeAfter = false) {
+            const preloader = document.getElementById('preloader');
+            if (!preloader) return;
+
+            if (show) {
+                // Show and reset preloader state
+                preloader.style.display = 'flex'; // Make visible
+                preloader.classList.remove('zoom-out'); // Reset animation state
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Zoom out and then hide or remove
+                preloader.classList.add('zoom-out');
+
+                setTimeout(() => {
+                if (removeAfter) {
+                    preloader.remove(); // Fully remove from DOM
+                } else {
+                    preloader.style.display = 'none'; // Just hide
+                }
+                document.body.style.overflow = '';
+                }, 1500); // Match zoom animation duration
+            }
+        }
+    });
+</script>
+{% endblock %}

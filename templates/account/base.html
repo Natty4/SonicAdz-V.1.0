@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+{% load i18n static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %} | SonicAdz</title>
+  <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="{% static 'image/favicon.ico' %}" type="image/x-icon" />
+  {% block extra_styles %}
+  {% endblock %}
+</head>
+<body>
+    <div class="alert-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="page-wrapper dashboard-page">
+        {% block side_bar %}
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <a href="{% url 'common:landing' %}">
+                            <img src="{% static 'images/default.jpg' %}" alt="AdChannel Logo">
+                        </a>
+                    </div>
+                    <button id="themeToggle">
+                        <i class="fas "></i>
+                    </button>
+                    <button class="sidebar-close" aria-label="Close sidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                </div>
+               
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="active">
+                            <a href="{% url 'users:profile' %}">
+                                <i class="fas fa-user"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{% if user.user_type == 'advertiser' %}
+                                {% url 'advertiser:dashboard' %}
+                                {% elif user.user_type == 'creator' %}
+                                {% url 'creator:dashboard' %}
+                                {% else %}{% endif %}">
+                                {% comment %} <i class="fas fa-home"></i> {% endcomment %}
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="9"></rect>
+                                    <rect x="14" y="3" width="7" height="5"></rect>
+                                    <rect x="14" y="12" width="7" height="9"></rect>
+                                    <rect x="3" y="16" width="7" height="5"></rect>
+                                </svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'users:edit-profile' %}">
+                                <i class="fas fa-edit"></i>
+                                <span>Edit Profile</span>
+                            </a>
+                        </li>
+                        
+                        <li class="sidebar-dropdown">
+                            <a href="#" class="dropdown-toggle">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                                <i class="fas fa-chevron-down dropdown-icon"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                <a href="{% url 'users:profile' %}">
+                                    <i class="fas fa-user"></i>
+                                    <span>Profile</span>
+                                </a>
+                                </li>
+                                <li>
+                                    <a href="#creator-payment-methods.html">
+                                        <i class="fas fa-wallet"></i>
+                                        <span>Payment Methods</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#creator-notifications.html">
+                                        <i class="fas fa-bell"></i>
+                                        <span>Notifications</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="sidebar-footer">
+                    <a href="#help.html" class="sidebar-help">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help Center</span>
+                    </a>
+                </div>
+            </aside>
+        {% endblock %}
+        <!-- Main Content Area -->
+        <main class="main-content">
+            {% block header %}
+                <!-- Header -->
+                 <header class="dashboard-header">
+                    <div class="header-left">
+                        <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="page-title">Profile</h1>
+                    </div>
+                </header>
+                
+            {% endblock %}
+            <div class="dashboard-content">
+                {% block dashboard_content %}
+                    
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    {% block footer %}
+        
+    {% endblock %}
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/navigation.js' %}"></script>
+
+    {% block extra_scripts %}
+    {% endblock %}
+</body>
+</html>
