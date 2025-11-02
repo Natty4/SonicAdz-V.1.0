@@ -10,4 +10,5 @@ This is a local payment-enabled ads platform for Telegram that empowers advertis
 * **Performance tracking** for both advertisers and channel owners.
 * **Transparent escrow system** for ad payments and payouts.
 
+ [Live Preview](https://sonicadz.vercel.app)
 ---
