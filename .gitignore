@@ -38,4 +38,4 @@ __pycache__/
 *.pyc
 
 
-.github
+.github/workflows/backup.yml
