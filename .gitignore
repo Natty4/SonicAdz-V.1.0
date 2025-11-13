@@ -36,6 +36,3 @@ pip-delete-this-directory.txt
 
 __pycache__/
 *.pyc
-
-
-.github/workflows/backup.yml
